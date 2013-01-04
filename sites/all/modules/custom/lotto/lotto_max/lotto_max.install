@@ -1,6 +1,9 @@
 <?php
 
-
+module_load_include('inc', 'lotto_max', 'db_schema/db_schema_lotto_max');
+module_load_include('inc', 'lotto_max', 'db_schema/db_schema_lotto_max_bets');
+module_load_include('inc', 'lotto_max', 'db_schema/db_schema_lotto_max_stats');
+module_load_include('inc', 'lotto_max', 'db_schema/db_schema_lotto_max_extra');
 /*
  * implements hook_enable
  */

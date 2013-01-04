@@ -1,24 +1,26 @@
 <?php
 
+module_load_include('inc', 'lotto_core', 'db_schema/db_schema_lotto_codelist');
+module_load_include('inc', 'lotto_core', 'db_schema/db_schema_lotto_prize_table');
 
 /*
  * implements hook_enable
  */
-function lotto_enable(){
+function lotto_core_enable(){
     
 }
 
 /*
  * implements hook_disable
  */
-function lotto_disable(){
+function lotto_core_disable(){
   
 }
 
 /**
  * Implements hook_install().
  */
-function lotto_install() {
+function lotto_core_install() {
   
     //drupal_install_schema('mt_core');  
    
@@ -27,7 +29,7 @@ function lotto_install() {
 /**
  * Implements hook_uninstall().
  */
-function lotto_uninstall() {
+function lotto_core_uninstall() {
     //drupal_uninstall_schema('mt_core');
     
 }
@@ -36,7 +38,7 @@ function lotto_uninstall() {
 /**
  * Implements hook_schema().
  */
-function lotto_schema() {
+function lotto_core_schema() {
     
     $schema=array();
     get_schema_lotto_codelist($schema);

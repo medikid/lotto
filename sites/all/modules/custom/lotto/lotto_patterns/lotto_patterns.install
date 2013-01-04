@@ -1,6 +1,6 @@
 <?php
 
-
+module_load_include('inc', 'lotto_patterns', 'db_schema/db_schema_lotto_patterns');
 /*
  * implements hook_enable
  */

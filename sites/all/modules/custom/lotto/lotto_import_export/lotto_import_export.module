@@ -172,4 +172,15 @@ function string_to_unix_timestamp($str_date, $date_format){
     return $unix_timestamp;
 }
 
+
+/*
+ * this function escapse 'comma' when the CSV row is exploded by ,
+ * eg 'dataa , datab' is kept intact, is not split if cell has comma
+ */
+function csv_row_to_array($row_data) {
+    $expr = "/,(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))/";
+    $results = preg_split($expr, trim($row_data));
+    return preg_replace("/^\"(.*)\"$/", "$1", $results);
+}
+
 ?>

@@ -1,6 +1,6 @@
 <?php
 
-function lotto_menu(){
+function lotto_core_menu(){
 
     $items=array();
     

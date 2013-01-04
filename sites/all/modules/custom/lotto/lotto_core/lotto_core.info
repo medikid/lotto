@@ -1,6 +1,6 @@
-name = Lotto
-description = Lotto
+name = LottoCore
+description = Lotto Core modules
 package = Lotto
 core = 7.x
-files[] = lotto.module
-files[] = lotto.install
+files[] = lotto_core.module
+files[] = lotto_core.install

@@ -1,6 +1,99 @@
-name = Lotto
-description = Lotto
-package = Lotto
+name = WinLotto
+description = Install standard Drupal Website with Lotto features.
+version = VERSION
 core = 7.x
-files[] = lotto.module
-files[] = lotto.install
+
+dependencies[] = block
+dependencies[] = book
+dependencies[] = ckeditor
+dependencies[] = field
+dependencies[] = field_sql_storage
+dependencies[] = color
+dependencies[] = options
+dependencies[] = file
+dependencies[] = filter
+dependencies[] = menu
+dependencies[] = node
+dependencies[] = comment
+dependencies[] = image
+dependencies[] = contextual
+dependencies[] = dashboard
+dependencies[] = dblog
+dependencies[] = user
+dependencies[] = text
+dependencies[] = system
+dependencies[] = taxonomy
+dependencies[] = services
+dependencies[] = rest_server
+
+
+dependencies[] = list
+dependencies[] = number
+dependencies[] = field_ui
+    
+
+dependencies[] = help
+dependencies[] = overlay
+dependencies[] = path
+dependencies[] = rdf
+dependencies[] = search
+dependencies[] = shortcut
+dependencies[] = trigger
+dependencies[] = update
+    
+
+dependencies[] = admin_menu
+dependencies[] = admin_menu_toolbar
+dependencies[] = admin_devel
+    
+
+dependencies[] = auto_nodetitle
+    
+
+dependencies[] = ctools
+
+
+dependencies[] = devel
+dependencies[] = devel_node_access
+    
+
+dependencies[] = entity
+dependencies[] = entity_token
+
+dependencies[] = field_group
+    
+
+dependencies[] = module_filter
+
+dependencies[] = rules
+dependencies[] = rules_scheduler
+dependencies[] = rules_admin
+
+dependencies[] = schema
+  
+dependencies[] = views
+dependencies[] = views_ui
+dependencies[] = views_bulk_operations
+
+dependencies[] = file_entity
+dependencies[] = media
+dependencies[] = media_internet
+dependencies[] = media_youtube
+dependencies[] = remote_stream_wrapper
+
+dependencies[] = lotto_core
+dependencies[] = lotto_charts
+dependencies[] = lotto_import_export
+dependencies[] = lotto_keno
+dependencies[] = lotto_max
+dependencies[] = lotto_patterns
+dependencies[] = lotto_stats
+
+files[] = winlotto.profile
+
+; Information added by drupal.org packaging script on 2012-02-01
+version = "7.18"
+project = "drupal"
+datestamp = "1328134560"
+
+

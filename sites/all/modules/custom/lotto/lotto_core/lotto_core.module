@@ -1,5 +1,5 @@
 <?php
-module_load_include('inc', 'lotto', 'lotto_admin_menu');
+module_load_include('inc', 'lotto_core', 'lotto_admin_menu');
 
 function lotto_codelist_code_load($subcat){
     $query = db_select('lotto_codelist', 'lcd')->fields('lcd')->condition('sub_cat', $subcat)->execute();

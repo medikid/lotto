@@ -1,5 +1,7 @@
 <?php
-
+module_load_include('inc', 'lotto_keno', 'db_schema/db_schema_lotto_keno');
+module_load_include('inc', 'lotto_keno', 'db_schema/db_schema_lotto_keno_bets');
+module_load_include('inc', 'lotto_keno', 'db_schema/db_schema_lotto_keno_stats');
 
 /*
  * implements hook_enable
