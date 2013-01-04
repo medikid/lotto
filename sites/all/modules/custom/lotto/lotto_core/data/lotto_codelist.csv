@@ -1,0 +1,7 @@
+code_id,cat,sub_cat,name,sub_name,code,sub_code,code_dependency,sub_code_dependency,disabled,date_disabled
+NULL,lotto_stats,stat_type,each_number_frequency,NULL,1,NULL,NULL,NULL,NULL,NULL
+NULL,lotto_stats,stat_type,each_draw_frequency,NULL,2,NULL,NULL,NULL,NULL,NULL
+NULL,lotto_stats,stat_type,each_draw_skipped,NULL,3,NULL,NULL,NULL,NULL,NULL
+NULL,lotto_keno,lotto_keno_result_sync_url_latestdraw,http://lotto.bclc.com/services2/keno/draw/latest/,NULL,1,NULL,NULL,NULL,NULL,NULL
+NULL,lotto_keno,lotto_keno_result_sync_url_today,http://lotto.bclc.com/services2/keno/draw/latest/today/,NULL,2,NULL,NULL,NULL,NULL,NULL
+NULL,lotto_keno,lotto_keno_result_sync_url_by_date,http://lotto.bclc.com/services2/keno/draw/,NULL,3,NULL,NULL,NULL,NULL,NULL
