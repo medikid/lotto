@@ -5,6 +5,87 @@ module_load_include('inc', 'lotto_import_export', 'lotto_import_export_forms');
 
 /*
  * upload csv entries into db
+ */    
+function db_upload_from_csv($module_name, $table_name, $csv_file_name, $non_string_fields=array()){
+    $TABLE_NAME = $table_name;
+    $CSV_FILE_NAME = $csv_file_name;
+    $NON_STRING_FIELDS = $non_string_fields;
+    $FIELD_NAMES_ARRAY = array();
+    $FIELD_NAMES = "";
+    $VALUES = "";
+    $row = 0;
+
+    $records = file(drupal_get_path('module', $module_name) . "/data/" . $CSV_FILE_NAME . ".csv");
+    foreach ($records as $line) {
+        $record = csv_row_to_array($line);
+        if ($row == 0) {
+            foreach ($record as $i => $value) {
+                $FIELD_NAMES_ARRAY[$i] = trim($value);
+                $FIELD_NAMES .= $i == 0 ? "`" . trim($value) . "`" : ", `" . trim($value) . "`";
+            }
+        } else {
+
+            foreach ($record as $i => $val) {
+                if (in_array($FIELD_NAMES_ARRAY[$i], $NON_STRING_FIELDS)){
+                    $VALUES .= $i == 0 ? ' '.$val : ', '.$val;
+                   
+                } elseif (trim($val) == "NULL"){
+                    $VALUES .= $i == 0 ? ' NULL' : ', NULL';
+                }else {
+                    $VALUES .= $i == 0 ? "'$val'" : ", '$val'";
+                }
+            }
+
+            $sql = "INSERT INTO `" . $TABLE_NAME . "` (" . $FIELD_NAMES . ") VALUE (" . $VALUES . ") ";
+
+            db_query($sql);
+
+            //reset VALUES
+            $VALUES = "";
+        }
+        $row++;
+    }
+}
+
+
+/*
+ * deletes matching CSV entries from database
+ */
+function db_delete_from_csv($module_name, $table_name, $csv_file_name, $filter_by=array(), $use_db_query=TRUE){
+    $TABLE_NAME = $table_name;
+    $CSV_FILE_NAME = $csv_file_name;
+    $FILTER_BY = $filter_by;
+    $FIELD_NAMES_ARRAY = array();
+    $FIELD_NAMES = "";
+    $VALUES = "";
+    $row = 0;
+
+    $records = file(drupal_get_path('module', $module_name) . "/data/" . $CSV_FILE_NAME . ".csv");
+    foreach ($records as $line) {
+        $record = csv_row_to_array($line);
+        if ($row == 0) {
+            foreach ($record as $i => $value) {
+                $FIELD_NAMES_ARRAY[$i] = trim($value);
+                $FIELD_NAMES .= $i == 0 ? "`" . trim($value) . "`" : ", `" . trim($value) . "`";
+            }
+        } else {
+
+            $db_delete = db_delete($TABLE_NAME);
+            
+            foreach ($record as $column => $val) {
+                if (in_array($FIELD_NAMES_ARRAY[$column], $FILTER_BY)){
+                    $db_delete->condition($FIELD_NAMES_ARRAY[$column], $val);
+                } 
+            }
+
+               $db_delete->execute();
+
+        }
+        $row++;
+    }
+}
+/*
+ * upload csv entries into db
  */ 
 function lotto_data_upload_from_csv($module_name, $table_name, $csv_file_name, $non_string_fields=array()){
     $TABLE_NAME = $table_name;

@@ -1,7 +1,7 @@
 <?php
 
 function get_lotto_keno_bets_review_form($form, &$form_state){
-    drupal_add_css(drupal_get_path('module', 'lotto') . '/css/number_grid.css', array('group' => CSS_DEFAULT, 'type' => 'file'));
+    drupal_add_css(drupal_get_path('module', 'lotto_core') . '/css/number_grid.css', array('group' => CSS_DEFAULT, 'type' => 'file'));
     
     $form = array();
     $bets_grid_all = lotto_bets_grid_create('lotto_keno');

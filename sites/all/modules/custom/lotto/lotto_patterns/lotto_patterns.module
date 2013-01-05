@@ -1,4 +1,6 @@
 <?php
+module_load_include('inc', 'lotto_patterns', 'lotto_autopicks');
+
 /*
  * //positives
  * diagonal_step_up

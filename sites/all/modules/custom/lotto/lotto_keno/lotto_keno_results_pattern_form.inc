@@ -1,8 +1,8 @@
 <?php
 
 function get_lotto_keno_results_pattern_form($form, &$form_state){
-    drupal_add_css(drupal_get_path('module', 'lotto') . '/css/number_grid.css', array('group' => CSS_DEFAULT, 'type' => 'file'));
-    drupal_add_js(drupal_get_path('module', 'lotto') . '/js/pattern_grid.js' );
+    drupal_add_css(drupal_get_path('module', 'lotto_core') . '/css/number_grid.css', array('group' => CSS_DEFAULT, 'type' => 'file'));
+    drupal_add_js(drupal_get_path('module', 'lotto_core') . '/js/pattern_grid.js' );
     
     $form=array(   );
     $form['pattern_refresh']=array(

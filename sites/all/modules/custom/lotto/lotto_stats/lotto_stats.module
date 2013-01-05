@@ -216,7 +216,7 @@ function lotto_stats_each_draw_skipped($lottery_name, $range_start=1, $range_end
 	    $stat_type_name = 'each_draw_skipped';
 	    $stats = get_stats_config($lottery_name, $stat_type_name );
 	    
-	    if($range_start == 1 || $range_end == 1){
+	    if($range_start == 1 && $range_end == 1){
 	    $stat_type_codes = lotto_codelist_code_load('stat_type');	    
 	    $last_stats = lotto_stats_last_stat_available($lottery_name, $stat_type_codes[$stat_type_name]);
 	    $last_results = lotto_last_result_available($lottery_name);
