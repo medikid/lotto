@@ -52,6 +52,7 @@ function table_header_clicked(element){
 	    }	
 }
 
+
 function clear_bets_form(){    
     jQuery('input[name="bets_for"]').val("");
     jQuery('input[name="bets_1"]').val("");
@@ -59,6 +60,5 @@ function clear_bets_form(){
     jQuery('input[name="bets_3"]').val("");
     jQuery('input[name="bets_4"]').val("");
     jQuery('input[name="bets_5"]').val("");
-    
     
 }

@@ -196,7 +196,7 @@ function lotto_pattern_grid_analysis($lottery_name, $lottery_id, $number_of_draw
     
 }
 
-function lotto_pattern_grid_create($lottery_name, $lottery_stats_id=1, $number_of_draws=100){
+function lotto_pattern_grid_create($lottery_name, $lottery_stats_id=1, $number_of_draws=100, $pre_selected=array()){
     $html = "<table class=\"pattern_grid\" > <tbody>";
     $stat_type_name = 'each_draw_skipped';
     $stat_type_codes = lotto_codelist_code_load('stat_type');
@@ -244,7 +244,9 @@ function lotto_pattern_grid_create($lottery_name, $lottery_stats_id=1, $number_o
 	    $x=1; $y=0; $z=80;
 	    $header = "<tr><th></th>";
 	    while ($x <= $z){
-		$header .= "<th id='".$x."'>".$x."</th>";
+		if (in_array($x, $pre_selected)){
+		    $header .= "<th id='".$x."' class=\"selected\" >".$x."</th>";
+		} else $header .= "<th id='".$x."'>".$x."</th>";
 		//$header .= "<th></th>";
 		$x++;
 	    }
@@ -415,8 +417,8 @@ function sync_results_today($lottery_name){
 	case 'lotto_max':
 	    break;
 	case 'lotto_keno':
-	   $sync_url_by_date = get_result_sync_url('lotto_keno', 'lotto_keno_result_sync_url_today');
-	   $url = $sync_url_by_date;
+	   $sync_url_by_date = get_result_sync_url('lotto_keno', 'lotto_keno_result_sync_url_by_date');
+	   $url = $sync_url_by_date . date('Y-m-d', time());
 	   $result_by_date_jsn = get_curl_d_output($url);
 	   $result_by_date = json_decode($result_by_date_jsn);
 	   krsort($result_by_date);//reverse sort by index

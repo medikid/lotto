@@ -15,6 +15,17 @@ function get_lotto_keno_results_pattern_form($form, &$form_state){
 	),
 	'#prefix'=>'<div class="container-inline">',
     );
+    
+    $form['auto_bets']=array(
+	'#type'=>'button',
+	 '#value'=>'Autopick',	 
+	 '#ajax'=>array(
+	    'callback' => 'ajx_autopick_bets',
+	    'wrapper'=>'ajx_keno_bets_wrapper',
+	    'method'=>'replace'
+	),
+    );
+    
      $form['place_bets']=array(
 	'#type'=>'button',
 	 '#value'=>'Place Bets',
@@ -55,8 +66,8 @@ function get_lotto_keno_results_pattern_form($form, &$form_state){
 	'#type'=>'fieldset',
 	'#title'=>'Bets Form',
 	'#collapsible' => TRUE,
-	'#collapsed' => TRUE,
-	'#prefix'=>'<div id="ajx_keno_bets_wrapper',
+	'#collapsed' => FALSE,
+	'#prefix'=>'<div id="ajx_keno_bets_wrapper" >',
 	'#suffix'=>'</div>'
     );
     $form['bets']['pattern_type']=array(
@@ -171,7 +182,7 @@ function ajx_place_bets($form, &$form_state){
 	}
 	$i++;
     }
-    dsm($form_state);
+    
     $form['bets'] = ajx_clear_bets($form, $form_state);
     $form['bets']['bets_1'] = $bets_collection;
     
@@ -179,7 +190,7 @@ function ajx_place_bets($form, &$form_state){
 }
 
 function ajx_clear_bets($form, $form_state){
-    $form['bets']['#prefix']='<div id="ajx_keno_bets_wrapper';
+    $form['bets']['#prefix']='<div id="ajx_keno_bets_wrapper" >';
     $form['bets']['#suffix']='</div>';
     
     $form['bets']['bets_for']['#default_value']="";
@@ -190,5 +201,29 @@ function ajx_clear_bets($form, $form_state){
     $form['bets']['bets_5']['#value']="";
     
     return $form['bets'];
+}
+
+function ajx_autopick_bets($form, $form_state){
+    $lotto_draw_num = $form_state['values']['bets_for'];
+    $auto_picks =  lotto_bets_autopick('lotto_keno', $lotto_draw_num);
+    
+    $form['bets']['bets_1']['#value']= autopicks_to_string($auto_picks['diagonal']);
+    $form['bets']['bets_2']['#value']= autopicks_to_string($auto_picks['pillar']);
+    $form['bets']['bets_3']['#value']= autopicks_to_string($auto_picks['ladder']);
+    $form['bets']['bets_4']['#value']= autopicks_to_string($auto_picks['sequence']);
+    $form['bets']['bets_5']['#value']= autopicks_to_string($auto_picks['previous_trend']);
+    
+    $form['bets']['pattern_grid']['#markup'] = lotto_pattern_grid_create("lotto_keno",1,100,array_merge($auto_picks['diagonal'], $auto_picks['pillar'], $auto_picks['ladder'], $auto_picks['sequence'], $auto_picks['previous_trend'] ));
+    
+     return $form['bets'];
+}
+
+function autopicks_to_string($autopicks_array){    
+    $str='';
+    foreach($autopicks_array as $pick){
+	$str .= $pick.' ';
+    }
+    $str = substr($str, 0, -1);
+    return $str;    
 }
 ?>
