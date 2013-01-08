@@ -90,14 +90,15 @@ function get_lotto_keno_results_pattern_form($form, &$form_state){
 	    '#title' => t('Bets For ID:'),	 
 	    '#default_value'=>'',
 	    '#size' => 20,
-	    '#prefix'=>'<div class="container-inline">'
+	    '#prefix'=>'<div class="container-inline" >'
 	 );
      $form['bets']['bets_1'] = array(
 	    '#type' => 'textfield',
-	    '#title' => t('Diagnoal:'),	 
+	    '#title' => t('Diagonal:'),	 
 	    '#default_value'=>'',
-	    '#size' => 30,
+	    '#size' => 30
 	 );
+     
      $form['bets']['bets_2'] = array(
 	    '#type' => 'textfield',
 	    '#title' => t('Pillar:'),	 
@@ -184,7 +185,6 @@ function ajx_place_bets($form, &$form_state){
     }
     
     $form['bets'] = ajx_clear_bets($form, $form_state);
-    $form['bets']['bets_1'] = $bets_collection;
     
     return $form['bets'];
 }

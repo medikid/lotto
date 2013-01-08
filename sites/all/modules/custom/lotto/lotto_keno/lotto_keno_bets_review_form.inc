@@ -20,7 +20,7 @@ function get_lotto_keno_bets_review_form($form, &$form_state){
 }
 
 function getKenoCurrentDrawNumber(){
-    $results = lotto_last_result_available('lotto_keno');
+    $results = lotto_results_last_available('lotto_keno');
     $lastDrawNumber = $results['draw_number'];
     $nextDrawNumber = $lastDrawNumber + 1;
     

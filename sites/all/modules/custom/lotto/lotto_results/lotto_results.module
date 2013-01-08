@@ -1,1 +1,224 @@
 <?php
+
+function lotto_results_by_draw_number($lottery_name, $draw_number){
+    $results='';
+    switch($lottery_name){
+	case'lotto_max':
+	    break;
+	case 'lotto_keno':
+	    $query = db_select('lotto_keno', 'lk')
+		    ->fields('lk')
+		    ->condition('draw_number', $draw_number)
+		    ->execute();
+	    $results = $query->fetchAssoc();
+	    break;	    
+	}
+	return $results;
+}
+
+function lotto_results_missing($lottery_name, $draw_number, $num_of_draws=100){
+    $range_start = $draw_number;
+    $range_end = $draw_number - $num_of_draws;
+    $draw_numbers = array();
+    $missing_results = array();
+    
+    $query  = db_select('lotto_keno', 'lk')->fields('lk', array('draw_number'))->condition('draw_number', array($range_end, $range_start) ,'BETWEEN')->execute();
+    
+    while($results = $query->fetchAssoc() ){
+	array_push($draw_numbers, $results['draw_number']);
+    }
+    
+    while ($range_end <= $range_start){
+	
+	if (!in_array($range_end, $draw_numbers) ){
+	    array_push($missing_results, $range_end);
+	} else 
+	
+	$range_end++;
+    }
+    
+    return $missing_results;
+}
+
+function lotto_results_sync_url_get($lottery_name, $var_subcat){
+    $url='';
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	    $keno_sync_url = lotto_codelist_code_load($var_subcat);
+	    foreach($keno_sync_url as $codes){
+		$url = $codes['name'];
+	    }
+	    break;
+    }
+    return $url;
+}
+
+function lotto_results_sync_by_draw_number($lottery_name, $draw_num){
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	   $draw_num_url = $draw_num . "/1/";
+	   $sync_url_by_date = lotto_results_sync_url_get('lotto_keno', 'lotto_keno_result_sync_url_by_date');
+	   $url = $sync_url_by_date.$draw_num_url;
+	   $result_by_drawnum_jsn = get_curl_d_output($url);
+	   $result_by_drawnum = json_decode($result_by_drawnum_jsn);
+	   
+	   
+	   foreach($result_by_drawnum as $result){
+	       $keno_result=array(
+		    'lkid'=>null,
+		    'draw_number'=>$result->drawNbr,
+		    'draw_date'=>string_to_unix_timestamp($result->drawDate." ".$result->drawTime, "M j, Y h:i:s A"),
+		    'bm'=>$result->drawBonus
+		);
+	      
+	       $numbers = $result->drawNbrs;
+	      foreach($numbers as $ind=>$num){
+		    $x=$ind+1;
+		    $keno_result['n'.$x] = $num;
+		}
+		$inserted = lotto_keno_results_insert($keno_result);
+	    }
+	    break;
+    }   
+}
+
+function lotto_results_sync_by_date($lottery_name, $date_unix_timestamp){
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	   $date_format = "Y-m-d";
+	   $date = date($date_format, $date_unix_timestamp);
+	   $sync_url_by_date = lotto_results_sync_url_get('lotto_keno', 'lotto_keno_result_sync_url_by_date');
+	   $url = $sync_url_by_date.$date;
+	   $result_by_date_jsn = get_curl_d_output($url);
+	   $result_by_date = json_decode($result_by_date_jsn);
+	   krsort($result_by_date);//reverse sort by index
+	   
+	   
+	   foreach($result_by_date as $result){
+	       $keno_result=array(
+		    'lkid'=>null,
+		    'draw_number'=>$result->drawNbr,
+		    'draw_date'=>string_to_unix_timestamp($result->drawDate." ".$result->drawTime, "M j, Y h:i:s A"),
+		    'bm'=>$result->drawBonus
+		);
+	      
+	       $numbers = $result->drawNbrs;
+	      foreach($numbers as $ind=>$num){
+		    $x=$ind+1;
+		    $keno_result['n'.$x] = $num;
+		}
+		$inserted = lotto_keno_results_insert($keno_result);
+	    }
+	    break;
+    }   
+}
+
+function lotto_results_sync_today($lottery_name){
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	   $sync_url_by_date = lotto_results_sync_url_get('lotto_keno', 'lotto_keno_result_sync_url_by_date');
+	   $url = $sync_url_by_date . date('Y-m-d', time());
+	   $result_by_date_jsn = get_curl_d_output($url);
+	   $result_by_date = json_decode($result_by_date_jsn);
+	   krsort($result_by_date);//reverse sort by index
+	   
+	   
+	   foreach($result_by_date as $result){
+	       $keno_result=array(
+		    'lkid'=>null,
+		    'draw_number'=>$result->drawNbr,
+		    'draw_date'=>string_to_unix_timestamp($result->drawDate." ".$result->drawTime, "M j, Y h:i:s A"),
+		    'bm'=>$result->drawBonus
+		);
+	      
+	       $numbers = $result->drawNbrs;
+	      foreach($numbers as $ind=>$num){
+		    $x=$ind+1;
+		    $keno_result['n'.$x] = $num;
+		}
+		$inserted = lotto_keno_results_insert($keno_result);
+	    }
+	    break;
+    }   
+}
+
+function lotto_results_sync_latestdraw($lottery_name){
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	   $sync_url_by_date = lotto_results_sync_url_get('lotto_keno', 'lotto_keno_result_sync_url_latestdraw');
+	   $url = $sync_url_by_date;
+	   $result_by_date_jsn = get_curl_d_output($url);
+	   $result = json_decode($result_by_date_jsn);
+	   
+	   
+	       $keno_result=array(
+		    'lkid'=>null,
+		    'draw_number'=>$result->drawNbr,
+		    'draw_date'=>string_to_unix_timestamp($result->drawDate." ".$result->drawTime, "M j, Y h:i:s A"),
+		    'bm'=>$result->drawBonus
+		);
+	      
+	       $numbers = $result->drawNbrs;
+	      foreach($numbers as $ind=>$num){
+		    $x=$ind+1;
+		    $keno_result['n'.$x] = $num;
+		}
+		$inserted = lotto_keno_results_insert($keno_result);
+	    break;
+    }   
+}
+
+function lotto_results_last_available($lottery_name){
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	    $last_result = db_select('lotto_keno', 'lk')
+		    ->fields('lk')
+		    ->orderBy('draw_number', 'DESC')
+		    ->range(0,1)
+		    ->execute()
+		    ->fetchAssoc();
+	    break;
+    }
+    return $last_result;
+}
+
+function lotto_results_get_uptodate($lottery_name){
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	    $last_result = lotto_results_last_available($lottery_name);
+	    $last_result_date_unix = $last_result['draw_date'];
+	    
+	    $todays_date = new DateTime(date('Y-m-d', time()));
+	    $last_result_date  = new DateTime(date('Y-m-d', $last_result_date_unix));
+	    $dDiff = $todays_date->diff($last_result_date);
+	    $neg = $dDiff->format('%R');
+	    $diff = $dDiff->days;
+	    $neg_diff = $neg.$diff;
+	    
+	    while ($neg_diff < 0){
+		$date_unix_timestamp = strtotime($neg_diff." days", time());
+		$insert = lotto_results_sync_by_date($lottery_name, $date_unix_timestamp);
+		
+		$neg_diff = $neg_diff + 1;
+	    }
+	    
+	    $t = lotto_results_sync_today($lottery_name);
+	    $l = lotto_results_sync_latestdraw($lottery_name);
+	    break;
+    }
+    return true;
+}

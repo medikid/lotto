@@ -207,3 +207,72 @@ function lotto_patterns_import($lottery_name, $lottery_id_top, $lottery_id_botto
 	    break;
     }
 }
+
+function lotto_patterns_diag_win_ratio_config($lottery_name){
+    $dwr_config=array();
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	    $x=1; $y=80;
+	    while ($x <= $y){
+		$dwr_config[$x] = array(
+					'forward'=>array(
+					    'wins'=>0,
+					    'count'=>0,
+					    'ratio'=>0
+					),
+					'backward'=>array(
+					    'wins'=>0,
+					    'count'=>0,
+					    'ratio'=>0
+					)
+				    );	    
+		$x++;
+	    }
+	    break;
+    }   
+    
+    return $dwr_config;
+}
+
+function lotto_patterns_diag_win_ratio($lottery_name, $draw_number, $num_of_results = 80){    
+    
+    $diag_wins_ratio = lotto_patterns_diag_win_ratio_config($lottery_name);
+    
+    
+    $draw_num = $draw_number; $x=0; $y= $num_of_results; $stat_type = 3;
+    $num = 1; $count=0;
+    
+    while($x <= $y){
+	$current_draw_num = $draw_num - $x;
+	$current_stats = lotto_stats_by_draw_number($lottery_name, $current_draw_num, $stat_type);
+	    while( $num <= $y ){
+
+		$current_num_forward = $num + $x;
+		if ($current_num_forward <= $y){
+		    if( $current_stats['s'.$current_num_forward] == 0){
+			$diag_wins_ratio[$num]['forward']['wins'] = $diag_wins_ratio[$num]['forward']['wins'] + 1;
+		    }
+		    
+		    $diag_wins_ratio[$num]['forward']['count']++;
+		}
+
+
+		$current_num_backward = $num - $x;
+		if ($current_num_backward > 0){
+		    if ($current_stats['s'.$current_num_backward] == 0){
+			$diag_wins_ratio[$num]['backward']['wins'] = $diag_wins_ratio[$num]['backward']['wins'] + 1;
+		    }
+		    $diag_wins_ratio[$num]['backward']['count']++;
+		}
+
+
+		$num++;
+	    }
+	
+	$x++;	    
+    }
+    
+    return $diag_wins_ratio;
+}

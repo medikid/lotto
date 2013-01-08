@@ -186,7 +186,7 @@ function lotto_stats_each_draw_skipped($lottery_name, $range_start=1, $range_end
 	    if($range_start == 1 || $range_end == 1){
 		    $stat_type_codes = lotto_codelist_code_load('stat_type');	    
 		    $last_stats = lotto_stats_last_stat_available($lottery_name, $stat_type_codes[$stat_type_name]);
-		    $last_results = lotto_last_result_available($lottery_name);
+		    $last_results = lotto_results_last_available($lottery_name);
 
 		    $range_start = $last_stats['last_id'];
 		    $range_end = $last_results['lmxid'];
@@ -219,7 +219,7 @@ function lotto_stats_each_draw_skipped($lottery_name, $range_start=1, $range_end
 	    if($range_start == 1 && $range_end == 1){
 	    $stat_type_codes = lotto_codelist_code_load('stat_type');	    
 	    $last_stats = lotto_stats_last_stat_available($lottery_name, $stat_type_codes[$stat_type_name]);
-	    $last_results = lotto_last_result_available($lottery_name);
+	    $last_results = lotto_results_last_available($lottery_name);
 	    
 	    $range_start = $last_stats['last_id'];
 	    $range_end = $last_results['lkid'];
@@ -257,6 +257,50 @@ function lotto_stats_each_draw_skipped($lottery_name, $range_start=1, $range_end
 	    break;
     }
 }
+
+Function lotto_stats_each_draw_skipped_by_draw_number($lottery_name, $draw_number){
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	    $stat_type_name = 'each_draw_skipped';
+	    $stats = get_stats_config($lottery_name, $stat_type_name );
+	    
+	    $lotto_keno_results = lotto_keno_result_by_draw_num($draw_number);
+	    foreach($lotto_keno_results as $lotto_result){
+		$stats['last_id'] = $lotto_result['lkid'];
+		$current_draw = array(
+		    $lotto_result['n1'],
+		    $lotto_result['n2'],
+		    $lotto_result['n3'],
+		    $lotto_result['n4'],
+		    $lotto_result['n5'],
+		    $lotto_result['n6'],
+		    $lotto_result['n7'],
+		    $lotto_result['n8'],
+		    $lotto_result['n9'],
+		    $lotto_result['n10'],
+		    $lotto_result['n11'],
+		    $lotto_result['n12'],
+		    $lotto_result['n13'],
+		    $lotto_result['n14'],
+		    $lotto_result['n15'],
+		    $lotto_result['n16'],
+		    $lotto_result['n17'],
+		    $lotto_result['n18'],
+		    $lotto_result['n19'],
+		    $lotto_result['n20']
+		    );
+		stats_frequency_increment($lottery_name, $stats);
+		update_stats_skipped($current_draw, $stats);
+		
+		lotto_keno_stats_insert($stats);
+	    }
+	    break;
+    }
+    
+}
+
 
 function update_stats_skipped($current_draw, &$stats_num_array){
     foreach($current_draw as $num ){
@@ -718,7 +762,8 @@ function lotto_results_by_stat_id($lottery_name, $stat_id){
 	}
 	return $results;
 }
-function lotto_stats_by_draw_number($lottery_name, $draw_number){
+
+function lotto_stats_by_draw_number($lottery_name, $draw_number, $stat_type){
     $stats='';
     switch($lottery_name){
 	case'lotto_max':
@@ -726,7 +771,7 @@ function lotto_stats_by_draw_number($lottery_name, $draw_number){
 	case 'lotto_keno':
 	    $query = db_select('lotto_keno', 'lk');
 	    $query->join('lotto_keno_stats', 'lks', 'lks.last_id = lk.lkid');
-	    $query->fields('lks')->condition('draw_number', $draw_number);
+	    $query->fields('lks')->condition('draw_number', $draw_number)->condition('stat_type', $stat_type);
 	    $stats=$query->execute()->fetchAssoc();
 	      break;
     }

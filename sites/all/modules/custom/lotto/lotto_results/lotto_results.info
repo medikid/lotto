@@ -1,9 +1,6 @@
-name = lotto_results
-description = 
+name = LottoResults
+description = Lotto Results module
+package = Lotto
 core = 7.x
-package = 
-php = 
-version =
-dependencies[] = 
-files[] = 
-configure = 
+files[] = lotto_results.module
+files[] = lotto_results.install
