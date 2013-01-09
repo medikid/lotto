@@ -1,6 +1,7 @@
 <?php
 module_load_include('inc', 'lotto_keno', 'db_schema/db_schema_lotto_keno');
 module_load_include('inc', 'lotto_keno', 'db_schema/db_schema_lotto_keno_bets');
+module_load_include('inc', 'lotto_keno', 'db_schema/db_schema_lotto_keno_bets_notes');
 module_load_include('inc', 'lotto_keno', 'db_schema/db_schema_lotto_keno_stats');
 
 /*
@@ -41,6 +42,7 @@ function lotto_keno_schema() {
     $schema=array();
     get_schema_lotto_keno($schema);
     get_schema_lotto_keno_bets($schema);
+    get_schema_lotto_keno_bets_notes($schema);
     get_schema_lotto_keno_stats($schema);
     
     return $schema;
