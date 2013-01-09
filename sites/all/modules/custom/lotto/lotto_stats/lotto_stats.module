@@ -858,3 +858,73 @@ function lotto_bets_grid_create($lottery_name){
     
     return $html;
 }
+
+function lotto_bets_grid_by_notes_create($lottery_name, $notes){
+    switch($lottery_name){
+	case'lotto_max':
+	    break;
+	case 'lotto_keno':
+		$html = "<table class=\"bets_grid\" ><tbody>";
+		$header = "<tr><th><input type='checkbox' name='select_all' value='1'></th>";
+		$x=1; $z=10;
+		while ($x <= $z){
+		    $header .= "<th>".$x."</th>";
+		    $x++;
+		}
+		$header .= "<th>Picks</th><th>Matches</th><th>Win</th>";
+		$header .= "</tr>";
+		
+		$query = db_select('lotto_keno_bets', 'lkb')
+				->fields('lkb')
+				->orderBy('lkbid', 'DESC')
+				//->orderBy('draw_number', 'DESC')
+				->range(0, 100)
+				->execute();
+		
+		$body = "";
+		while($bets = $query->fetchAssoc()){    
+		    
+		    $result_data = db_select('lotto_keno', 'lk')
+			    ->fields('lk')
+			    ->condition('draw_number', $bets['draw_number'])
+			    ->execute()
+			    ->fetchAssoc();
+		    
+		    $body .= "<tr><th><input type='checkbox' name='live_bets_flag' value='";
+		    $body .= $bets['draw_number']."' ";
+		    $body .= ($bets['live_bets_flag'] == 1) ? " Checked >" : " >";
+		    $body .= date("d M h:i", $result_data['draw_date'])."</th>";
+		    
+		    $x=1; $z=10;
+		    while ($x <= $z){
+			$body .= "<td";
+			if ($bets['b'.$x] == null){
+			    $body .= " class=\"black\" ></td>";
+			} else {
+			    $n=1; $m=20;
+			    while ($n <= $m){
+				if ( $result_data['n'.$n] == $bets['b'.$x] ){
+				    $body .= " class=\"green\" ";
+				}
+				$n++;
+			    }
+			    $body .= " >";
+			    $body .= $bets['b'.$x];
+			    $body .= "</td>";			    
+			    }
+			$x++;
+		    }
+		    $body .= "<td>".$bets['picks']."</td>";
+		    $body .= "<td>".$bets['matches']."</td>";
+		    $body .= "<td>".$bets['win']."</td>";
+		    $body .= "</tr>";
+		}
+		
+		$html .=$header;
+		$html .=$body;
+		$html .="</tbody></table>";
+	    break;
+    }
+    
+    return $html;
+}

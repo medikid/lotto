@@ -6,6 +6,8 @@ module_load_include('inc', 'lotto_keno', 'lotto_keno_results_analysis_form');
 module_load_include('inc', 'lotto_keno', 'lotto_keno_results_sync_form');
 module_load_include('inc', 'lotto_keno', 'lotto_keno_results_pattern_form');
 module_load_include('inc', 'lotto_keno', 'lotto_keno_bets_review_form');
+module_load_include('inc', 'lotto_keno', 'lotto_keno_patterns_diag_wins_review_form');
+module_load_include('inc', 'lotto_keno', 'lotto_keno_bets_diag_wins_form');
 
 function lotto_keno_result_exists($keno_draw_number){
     $exists = false;

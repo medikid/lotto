@@ -22,9 +22,17 @@ function lotto_keno_menu(){
 	
 	$items['admin/lotto/lottokeno/bets'] = array(
         'title' => 'Bets Review',
-        'description' => 'Review Beets',
+        'description' => 'Review Bets',
         'page callback' => 'drupal_get_form',
         'page arguments' => array('get_lotto_keno_bets_review_form'),
+        'access arguments' => array('Access Lotto Max Charts'),
+        );
+	
+	$items['admin/lotto/lottokeno/bets/diagwins'] = array(
+        'title' => 'Bets from Diag Wins Pattern',
+        'description' => 'Review Beets',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('get_lotto_keno_bets_diag_wins_form'),
         'access arguments' => array('Access Lotto Max Charts'),
         );
 	
@@ -37,7 +45,7 @@ function lotto_keno_menu(){
         );
 	
 	$items['admin/lotto/lottokeno/results/sync'] = array(
-        'title' => 'Sync Results',
+        'title' => 'Sync Online',
         'description' => 'Sync Results with bclc',
         'page callback' => 'drupal_get_form',
         'page arguments' => array('get_lotto_keno_results_sync_form'),
@@ -45,10 +53,18 @@ function lotto_keno_menu(){
         );
 	
 	$items['admin/lotto/lottokeno/results/pattern'] = array(
-        'title' => 'Results Pattern',
+        'title' => 'Patterns',
         'description' => 'View results trend',
         'page callback' => 'drupal_get_form',
         'page arguments' => array('get_lotto_keno_results_pattern_form'),
+        'access arguments' => array('Access Lotto Keno Charts'),
+        );
+	
+	$items['admin/lotto/lottokeno/results/pattern/diagwins'] = array(
+        'title' => 'Diag Wins',
+        'description' => 'Diag Wins Pattern trend',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('get_lotto_keno_patterns_diag_wins_review_form'),
         'access arguments' => array('Access Lotto Keno Charts'),
         );
 	

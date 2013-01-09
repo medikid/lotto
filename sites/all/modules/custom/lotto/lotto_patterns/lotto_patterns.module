@@ -241,38 +241,121 @@ function lotto_patterns_diag_win_ratio($lottery_name, $draw_number, $num_of_resu
     $diag_wins_ratio = lotto_patterns_diag_win_ratio_config($lottery_name);
     
     
-    $draw_num = $draw_number; $x=0; $y= $num_of_results; $stat_type = 3;
-    $num = 1; $count=0;
+    $draw_num = $draw_number; $x=0; $y = $num_of_results; $z = 80; $stat_type = 3;
     
-    while($x <= $y){
+    $all_stats= array();
+    
+    while($x <= $num_of_results){
 	$current_draw_num = $draw_num - $x;
 	$current_stats = lotto_stats_by_draw_number($lottery_name, $current_draw_num, $stat_type);
-	    while( $num <= $y ){
+		
+	    for($num = 1; $num <= $z; $num++){
 
 		$current_num_forward = $num + $x;
-		if ($current_num_forward <= $y){
+		if ($current_num_forward <= $z){
 		    if( $current_stats['s'.$current_num_forward] == 0){
-			$diag_wins_ratio[$num]['forward']['wins'] = $diag_wins_ratio[$num]['forward']['wins'] + 1;
+			$diag_wins_ratio[$num]['forward']['wins']++;
 		    }
 		    
-		    $diag_wins_ratio[$num]['forward']['count']++;
+		   $diag_wins_ratio[$num]['forward']['count']++;
 		}
 
 
 		$current_num_backward = $num - $x;
 		if ($current_num_backward > 0){
-		    if ($current_stats['s'.$current_num_backward] == 0){
-			$diag_wins_ratio[$num]['backward']['wins'] = $diag_wins_ratio[$num]['backward']['wins'] + 1;
+		    if ( $current_stats['s'.$current_num_backward] == 0){
+			$diag_wins_ratio[$num]['backward']['wins']++;
 		    }
-		    $diag_wins_ratio[$num]['backward']['count']++;
+		   $diag_wins_ratio[$num]['backward']['count']++;
 		}
 
-
-		$num++;
+		
 	    }
 	
 	$x++;	    
     }
     
+    
+    foreach ($diag_wins_ratio as $num => $data){
+	
+	$diag_wins_ratio[$num]['forward']['ratio'] = round(($data['forward']['wins'] / $data['forward']['count']), 3);
+	$diag_wins_ratio[$num]['backward']['ratio'] = round(($data['backward']['wins'] / $data['backward']['count']), 3);
+    }
+    
     return $diag_wins_ratio;
+}
+
+function lotto_patterns_diag_win_ratio_sorted($diag_wins_ratio){
+    
+    $forward_ratios = array();
+    $backward_ratios = array();
+    foreach ($diag_wins_ratio as $num => $data){
+	$forward_ratios[$num] = $data['forward']['ratio'];
+	$backward_ratios[$num] = $data['backward']['ratio'];
+    }
+    
+    arsort($forward_ratios);
+    arsort($backward_ratios);
+    $forward=array();
+    $backward=array();
+    foreach($forward_ratios as $num=>$ratio){
+	array_push($forward, array($num => $diag_wins_ratio[$num]['forward'] ) );
+    }
+    
+    foreach($backward_ratios as $num=>$ratio){
+	array_push($backward, array($num => $diag_wins_ratio[$num]['backward'] ) );
+    }
+    $ratio_sorted = array();
+    for($i=0;$i<80;$i++){
+	$ratio_sorted[$i+1] = array(
+	    'forward' =>$forward[$i],
+	    'backward'=>$backward[$i]		
+	    );	
+    }
+  
+    return $ratio_sorted;
+}
+
+function lotto_patterns_diag_win_pattern_grid_create($lottery_name, $draw_number, $num_of_results = 80){
+    $header = "<table class=\"diag_wins_pattern_grid\"><tbody>";
+    
+    $body = "<tr>";
+    $body .= "<th>Rank</th>";
+    $body .= "<th>Number(Step Up)</th><th>Ratio</th><th>Wins / Count</th>";
+    $body .= "<th></th><th></th>";
+    $body .= "<th>Number(Step Down)</th><th>Ratio</th><th>Wins / Count</th>";
+    $body .= "</tr>";
+    
+    $diag_wins_ratio = lotto_patterns_diag_win_ratio($lottery_name, $draw_number, $num_of_results);
+    $ratios_sorted = lotto_patterns_diag_win_ratio_sorted($diag_wins_ratio);
+    
+    foreach($ratios_sorted as $rank=>$data){
+	$body .= "<tr>";
+	$body .= "<th>".$rank."</th>";
+	
+	foreach($data['backward'] as $num_b=>$values_b){
+	     $body .= "<td>".$num_b."</td>";
+	    $body .= "<td>".$values_b['ratio']."</td>";
+	    $body .= "<td>".$values_b['wins']." / ".$values_b['count']."</td>";
+	}
+	
+	$body .= "<td></td><td></td>";
+	
+	foreach($data['forward'] as $num_f=>$values_f){
+	    $body .= "<td>".$num_f."</td>";
+	    $body .= "<td>".$values_f['ratio']."</td>";
+	    $body .= "<td>".$values_f['wins']." / ".$values_f['count']."</td>";
+	}
+	
+	
+	
+	$body .= "</tr>";
+    }
+    
+    
+    
+    $footer = "</tbody></table>";
+    
+    $diag_wins_pattern_grid = $header . $body . $footer;
+    return $diag_wins_pattern_grid;    
 }
