@@ -1,5 +1,77 @@
 <?php
 
+function lotto_results_draw_number_get_current($lottery_name){
+    $current_draw_number = '';
+    switch($lottery_name){
+	case'lotto_max':
+	    break;
+	case 'lotto_keno':	   
+	    $last_result = lotto_results_last_available($lottery_name);
+	    
+	    $last_draw_number = $last_result['draw_number'];
+	    $last_time = $last_result['draw_date'];
+	    
+	    $current_time = time();
+	    $time_diff = $current_time - $last_time;
+	    
+	    $time_per_draw = 4 * 60;
+	    $no_of_missing_draws = round(($time_diff / $time_per_draw), 0) ;
+
+	    $current_draw_number =  $last_draw_number  + $no_of_missing_draws;
+	    break;
+    }
+    return $current_draw_number;
+}
+
+function lotto_results_draw_numbers_outstanding_list($lottery_name){
+    $missing_draw_numbers = array();
+    switch($lottery_name){
+	case'lotto_max':
+	    break;
+	case 'lotto_keno':
+	    $last_result = lotto_results_last_available($lottery_name);	    
+	    $last_draw_number = $last_result['draw_number'];
+	    $last_time = $last_result['draw_date'];
+	    
+	    $current_time = time();
+	    $time_diff = $current_time - $last_time;
+	    
+	    $time_per_draw = 4 * 60;
+	    $no_of_missing_draws = round(($time_diff / $time_per_draw), 0) ;
+
+	    $current_draw_number =  $last_draw_number  + $no_of_missing_draws;
+	    
+	    for($i = $last_draw_number + 1; $i < $current_draw_number; $i++ ){
+		array_push($missing_draw_numbers, $i);
+	    }
+	    	    
+	    break;
+    }
+    return $missing_draw_numbers;
+}
+
+function lotto_results_n_stats_sync_by_draw_numbers($lottery_name){
+    switch($lottery_name){
+	case'lotto_max':
+	    break;
+	case 'lotto_keno':	    
+	    $list_of_missing_draw_numbers = lotto_results_draw_numbers_outstanding_list($lottery_name);
+	    if(count($list_of_missing_draw_numbers) > 0){
+		
+		foreach($list_of_missing_draw_numbers as $draw_num){
+		    lotto_results_sync_by_draw_number($lottery_name, $draw_num);
+		    lotto_stats_each_draw_skipped_by_draw_number($lottery_name, $draw_num);
+		}
+		//just in case call the latest draw
+		//lotto_results_sync_latestdraw($lottery_name);
+		
+		return true;
+	    }
+	    break;
+    }
+}
+
+
 function lotto_results_by_draw_number($lottery_name, $draw_number){
     $results='';
     switch($lottery_name){

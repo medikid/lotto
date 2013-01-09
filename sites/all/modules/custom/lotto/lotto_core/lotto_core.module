@@ -264,6 +264,7 @@ function lotto_pattern_grid_create($lottery_name, $lottery_stats_id=1, $number_o
 	    $header .="</tr>";
 	    
 	    $body="";
+	    $body .="<div id=\"ajx_keno_results_pattern_wrapper\" ></div>";
 		if ($lottery_stats_id == 1){
 		    $last_stats = lotto_stats_last_stat_available($lottery_name, $stat_type);
 		    $lottery_stats_id = $last_stats['lksid'];
