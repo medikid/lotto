@@ -60,6 +60,14 @@ function lotto_keno_menu(){
         'access arguments' => array('Access Lotto Max Charts'),
         );
 	
+	$items['admin/lotto/lottokeno/bets/autopicks/efficiencyreport'] = array(
+        'title' => 'Efficiency Report',
+        'description' => 'Autopicks Efficiency Report',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('get_lotto_keno_autopicks_efficiency_report_form'),
+        'access arguments' => array('Access Lotto Max Charts'),
+        );
+	
 	$items['admin/lotto/lottokeno/bets/diagwins'] = array(
         'title' => 'Bets from Diag Wins Pattern',
         'description' => 'Review Bets',
