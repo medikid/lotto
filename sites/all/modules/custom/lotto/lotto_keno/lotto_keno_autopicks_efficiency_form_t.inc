@@ -4,7 +4,7 @@ function get_lotto_keno_autopicks_efficiency_form_t(){
     
     $form = array();
     $last_keno_draw_num = get_last_keno_drawnumber("lotto_keno");
-    $num_of_draws_default = 15;
+    $num_of_draws_default = 50;
     
     $form['efficiency']=array(
 	'#type'=>  'fieldset',

@@ -5,7 +5,7 @@ function get_lotto_keno_autopicks_efficiency_form(){
     
     $form = array();
     $last_keno_draw_num = get_last_keno_drawnumber("lotto_keno");
-    $num_of_draws_default = 15;
+    $num_of_draws_default = 50;
     
     $form['efficiency']=array(
 	'#type'=>  'fieldset',
@@ -45,20 +45,35 @@ function get_lotto_keno_autopicks_efficiency_form(){
 	),
     );
     
-    $form['efficiency']['review_efficiency']=array(
+    $form['efficiency']['refresh']=array(
 	'#type'=>'button',
-	'#value'=>t('Review'),
+	'#value'=>t('Refresh'),
 	'#ajax'=>array(
-	    
+	    'callback' => 'ajx_autopicks_efficiency_refresh',
+	    'wrapper'=>'ajx_autopicks_efficiency_wrapper',
+	    'method'=>'replace'
+	),
+    );
+    
+    $form['efficiency']['show_result_patterns']=array(
+	'#type'=>'checkbox',
+	'#title'=>t("Show Results: "),
+	'#default_value'=>0,
+	'#ajax'=>array(
+	    'callback' => 'ajx_show_result_patterns',
+	    'wrapper'=>'ajx_result_patterns_wrapper',
+	    'method'=>'replace'
 	),
 	'#suffix'=>'</div>'
-    );
+	);
     
     $form['efficiency']['results']=array(
 	'#type'=>  'fieldset',
 	'#title'=>t("Result Patterns:"),
 	'#collapsible'=>true,
-	'#collapsed'=>true
+	'#collapsed'=>true,	
+	'#prefix'=>'<div id="ajx_result_patterns_wrapper" >',
+	'#suffix'=>'</div>'
     );
     
     $form['efficiency']['results']['validate_with_draw']=array(
@@ -98,7 +113,8 @@ function get_lotto_keno_autopicks_efficiency_form(){
 	'#type'=>'textfield',
 	'#title'=>t('Number Of Draws to Review: '),
 	'#default_value'=>$num_of_draws_default,
-	'#size'=>5,	 
+	'#size'=>5,
+	'#prefix'=>'<div class="container-inline">',
 	'#suffix'=>'</div>'
     );
      
@@ -117,6 +133,7 @@ function ajx_draw_number_prev($form, $form_state){
     $lottery_name = "lotto_keno";
     $draw_number = $form_state['values']['draw_number'];
     $num_of_draws = $form_state['values']['number_of_draws'];
+    $show_result_patterns = $form_state['values']['show_result_patterns'];
     
     $draw_number_prev = $draw_number - 1;
     $form['efficiency']['draw_number']['#value'] = $draw_number_prev;
@@ -124,8 +141,9 @@ function ajx_draw_number_prev($form, $form_state){
     $draw_number_val = $draw_number_prev + 1;
     
     $form['efficiency']['results']['validate_with_draw']['#value'] = $draw_number_val;
-    $form['efficiency']['results']['results_grid']['#markup'] = lotto_patterns_grid_by_drawnum_create($lottery_name, $draw_number_prev, $num_of_draws, $draw_number_val );
-    
+    if ($show_result_patterns == 1){
+	$form['efficiency']['results']['results_grid']['#markup'] = get_lotto_patterns_result_grid($form, $form_state);
+    }
     $form['efficiency']['autopicks']['numbers']['#markup'] = lotto_patterns_autopicks_grid_create($lottery_name, $draw_number_prev, $draw_number_val);
     $form['efficiency']['diag_wins']['diag_wins_pattern']['#markup'] = lotto_patterns_diag_win_pattern_grid_create($lottery_name, $draw_number_prev, $num_of_draws, $draw_number_val);
     
@@ -136,6 +154,7 @@ function ajx_draw_number_next($form, $form_state){
     $lottery_name = "lotto_keno";
     $draw_number = $form_state['values']['draw_number'];
     $num_of_draws = $form_state['values']['number_of_draws'];
+    $show_result_patterns = $form_state['values']['show_result_patterns'];
     
     $draw_number_next = $draw_number + 1;
     $form['efficiency']['draw_number']['#value'] = $draw_number_next;
@@ -143,13 +162,31 @@ function ajx_draw_number_next($form, $form_state){
     $draw_number_val = $draw_number_next + 1;
     
     $form['efficiency']['results']['validate_with_draw']['#value']  = $draw_number_val;
-    $form['efficiency']['results']['results_grid']['#markup'] = lotto_patterns_grid_by_drawnum_create($lottery_name, $draw_number_next, $num_of_draws, $draw_number_val );
-    
+    if ($show_result_patterns == 1){
+	$form['efficiency']['results']['results_grid']['#markup'] =get_lotto_patterns_result_grid($form, $form_state);
+    }
     $form['efficiency']['autopicks']['numbers']['#markup'] = lotto_patterns_autopicks_grid_create("lotto_keno", $draw_number_next, $draw_number_val);
     $form['efficiency']['diag_wins']['diag_wins_pattern']['#markup'] = lotto_patterns_diag_win_pattern_grid_create($lottery_name, $draw_number_next, $num_of_draws, $draw_number_val);
     
     return $form['efficiency'];
 }
+
+function ajx_autopicks_efficiency_refresh($form, $form_state){
+    $lottery_name = "lotto_keno";
+    $draw_number = $form_state['values']['draw_number'];
+    $num_of_draws = $form_state['values']['number_of_draws'];
+    $show_result_patterns = $form_state['values']['show_result_patterns'];
+    $draw_number_val = $form_state['values']['validate_with_draw'];
+    
+    if ($show_result_patterns == 1){
+	$form['efficiency']['results']['results_grid']['#markup'] = get_lotto_patterns_result_grid($form, $form_state);
+    }
+    $form['efficiency']['autopicks']['numbers']['#markup'] = lotto_patterns_autopicks_grid_create("lotto_keno", $draw_number, $draw_number_val);
+    $form['efficiency']['diag_wins']['diag_wins_pattern']['#markup'] = lotto_patterns_diag_win_pattern_grid_create($lottery_name, $draw_number, $num_of_draws, $draw_number_val);
+    
+    return $form['efficiency'];
+}
+
 
 function get_last_keno_drawnumber($lottery_name){
     $last_results = lotto_results_last_available($lottery_name); 
@@ -157,6 +194,27 @@ function get_last_keno_drawnumber($lottery_name){
     
 }
 
+function get_lotto_patterns_result_grid($form, $form_state){
+    $lottery_name = "lotto_keno";
+    $draw_num = $form_state['values']['draw_number'];
+    $num_of_draws = $form_state['values']['number_of_draws'];
+    $draw_num_val = $form_state['values']['validate_with_draw'];
+    
+    $results_pattern_grid = lotto_patterns_grid_by_drawnum_create($lottery_name, $draw_num, $num_of_draws, $draw_num_val );
 
+    return $results_pattern_grid;
+}
+
+function ajx_show_result_patterns($form, $form_state){
+    $show_result_patterns = $form_state['values']['show_result_patterns'];
+    $result_patterns_grid = "";
+    if ($show_result_patterns == 1){
+	$result_patterns_grid = get_lotto_patterns_result_grid($form, $form_state);
+    }
+    $form['efficiency']['results']['results_grid']['#collapsed'] = false;
+    $form['efficiency']['results']['results_grid']['#markup'] = $result_patterns_grid;
+    
+    return $form['efficiency']['results'];
+}
 
 ?>
