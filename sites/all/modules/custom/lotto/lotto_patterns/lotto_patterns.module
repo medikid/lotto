@@ -316,7 +316,19 @@ function lotto_patterns_diag_win_ratio_sorted($diag_wins_ratio){
     return $ratio_sorted;
 }
 
-function lotto_patterns_diag_win_pattern_grid_create($lottery_name, $draw_number, $num_of_results = 80){
+function lotto_patterns_diag_win_pattern_grid_create($lottery_name, $draw_number, $num_of_results = 80, $draw_num_to_validate = null){
+    
+    if ( $draw_num_to_validate == null){
+	$lotto_results = array();
+    } else {
+	$lotto_results = array();
+	$draw_results = lotto_results_by_draw_number($lottery_name, $draw_num_to_validate);
+	for($i=1; $i <= 20; $i++){
+	    array_push($lotto_results, $draw_results['n'.$i]);
+	}
+    }
+    
+    
     $header = "<table class=\"diag_wins_pattern_grid\"><tbody>";
     
     $body = "<tr>";
@@ -334,7 +346,8 @@ function lotto_patterns_diag_win_pattern_grid_create($lottery_name, $draw_number
 	$body .= "<th>".$rank."</th>";
 	
 	foreach($data['backward'] as $num_b=>$values_b){
-	     $body .= "<td>".$num_b."</td>";
+	    $body .= ( in_array($num_b, $lotto_results) ) ? "<td class=\"green\" >" : "<td>";
+	    $body .= $num_b."</td>";
 	    $body .= "<td>".$values_b['ratio']."</td>";
 	    $body .= "<td>".$values_b['wins']." / ".$values_b['count']."</td>";
 	}
@@ -342,7 +355,8 @@ function lotto_patterns_diag_win_pattern_grid_create($lottery_name, $draw_number
 	$body .= "<td></td><td></td>";
 	
 	foreach($data['forward'] as $num_f=>$values_f){
-	    $body .= "<td>".$num_f."</td>";
+	    $body .= ( in_array($num_f, $lotto_results) ) ? "<td class=\"green\" >" : "<td>";
+	    $body .= $num_f."</td>";
 	    $body .= "<td>".$values_f['ratio']."</td>";
 	    $body .= "<td>".$values_f['wins']." / ".$values_f['count']."</td>";
 	}
@@ -358,4 +372,131 @@ function lotto_patterns_diag_win_pattern_grid_create($lottery_name, $draw_number
     
     $diag_wins_pattern_grid = $header . $body . $footer;
     return $diag_wins_pattern_grid;    
+}
+
+function lotto_patterns_autopicks_grid_create($lottery_name, $lottery_draw_num, $draw_num_to_validate = null){
+    $header ="<table class=\"autopicks_grid\" ><tbody>";
+    $body="";
+    
+    $autopicks = lotto_bets_autopick($lottery_name, $lottery_draw_num);
+    
+    if ( $draw_num_to_validate == null){
+	$lotto_results = array();
+    } else {
+	$lotto_results = array();
+	$draw_results = lotto_results_by_draw_number($lottery_name, $draw_num_to_validate);
+	for($i=1; $i <= 20; $i++){
+	    array_push($lotto_results, $draw_results['n'.$i]);
+	}
+    }
+    
+    for($i=0; $i <= 20; $i++){	
+	if($i == 0){
+		$body .= "<tr><th></th>";
+	 } else $body .= "<th>".$i."</th>";	
+    }
+    $body .="</tr>";
+    
+    if (count($autopicks['diagonal']) > 0){
+	
+	for($i=0; $i <= 20; $i++){
+	    if($i == 0){
+		$body .= "<tr><th>Diagonal</th>";
+		$body .= "<td>".$autopicks['diagonal'][$i]."</td>";
+	    } elseif ($i < count($autopicks['diagonal']) ){
+		$body .= ( in_array($autopicks['diagonal'][$i], $lotto_results) ) ? "<td class=\"green\" >" : "<td>";
+		$body .= $autopicks['diagonal'][$i]."</td>";
+	    } else $body .= "<td class=\"black\" ></td>";
+	}
+	$body .="</tr>";
+    }
+    
+    if (count($autopicks['pillar']) > 0){
+	
+	for($i=0; $i <= 20; $i++){	
+	    if($i == 0){
+		$body .= "<tr><th>Pillar</th>";
+		$body .= "<td>".$autopicks['pillar'][$i]."</td>";
+	    } elseif ($i < count($autopicks['pillar']) ){
+		$body .= ( in_array($autopicks['pillar'][$i], $lotto_results) ) ? "<td class=\"green\" >" : "<td>";
+		$body .= $autopicks['pillar'][$i]."</td>";	
+	    } else $body .= "<td class=\"black\" ></td>";	
+	}
+	$body .="</tr>";
+    }
+    
+    if (count($autopicks['ladder']) > 0){
+	
+	for($i=0; $i <= 20; $i++){	
+	    if($i == 0){
+		$body .= "<tr><th>Ladder</th>";
+		$body .= "<td>".$autopicks['ladder'][$i]."</td>";	
+	    } elseif ($i < count($autopicks['ladder']) ){
+		$body .= ( in_array($autopicks['ladder'][$i], $lotto_results) ) ? "<td class=\"green\" >" : "<td>";
+		$body .= $autopicks['ladder'][$i]."</td>";	
+	    } else $body .= "<td class=\"black\" ></td>";
+	}
+	$body .="</tr>";
+    }
+    
+    if (count($autopicks['sequence']) > 0){
+	
+	for($i=0; $i <= 20; $i++){	
+	    if($i == 0){
+		$body .= "<tr><th>Sequence</th>";
+		$body .= "<td>".$autopicks['sequence'][$i]."</td>";		
+	    }  elseif ($i < count($autopicks['sequence']) ){
+		$body .= ( in_array($autopicks['sequence'][$i], $lotto_results) ) ? "<td class=\"green\" >" : "<td>";
+		$body .= $autopicks['sequence'][$i]."</td>";	
+	    } else $body .= "<td class=\"black\" ></td>";
+	}
+	$body .="</tr>";
+    }
+    
+    if (count($autopicks['previous_trend']) > 0){
+	
+	for($i=0; $i <= 20; $i++){	
+	    if($i == 0){
+		$body .= "<tr><th>Previous Trend</th>";
+		 $body .= "<td>".$autopicks['previous_trend'][$i]."</td>";			
+	    } elseif ($i < count($autopicks['previous_trend']) ){
+		$body .= ( in_array($autopicks['previous_trend'][$i], $lotto_results) ) ? "<td class=\"green\" >" : "<td>";
+		$body .= $autopicks['previous_trend'][$i]."</td>";
+	    } else $body .= "<td class=\"black\" ></td>";	
+	}
+	$body .="</tr>";
+    }
+    
+    $footer ="</tbody></table>";
+    
+    $autopicks_grid = $header.$body.$footer;
+    return $autopicks_grid;
+}
+
+function lotto_patterns_grid_by_drawnum_create($lottery_name, $draw_num, $number_of_draws=100, $draw_num_to_validate=null){
+   $patterns_grid = "";
+    
+   switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	    if ( $draw_num_to_validate == null){
+		$lotto_results = array();
+	    } else {
+		$lotto_results = array();
+		$draw_results = lotto_results_by_draw_number($lottery_name, $draw_num_to_validate);
+		for($i=1; $i <= 20; $i++){
+		    array_push($lotto_results, $draw_results['n'.$i]);
+		}
+	    }
+
+	    $stat_type = 3;
+	    $lotto_stats = lotto_stats_by_draw_number($lottery_name, $draw_num, $stat_type);
+	    
+	    $patterns_grid = lotto_pattern_grid_create($lottery_name, $lotto_stats['lksid'], $number_of_draws, $lotto_results);
+	    
+	    break;
+    }
+    
+    return $patterns_grid;
 }

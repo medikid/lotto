@@ -130,24 +130,19 @@ function get_lotto_keno_results_pattern_form($form, &$form_state){
    
     $form['bets']['pattern_grid'] = array(
 	'#markup'=> lotto_pattern_grid_create("lotto_keno"),
-	//'#prefix'=>'<div id="ajx_keno_results_pattern_wrapper" >',
-	//'#suffix'=>'</div>'
+	'#prefix'=>'<div id="ajx_keno_results_pattern_wrapper" >',
+	'#suffix'=>'</div>'
     );
     
     return $form;
 }
 
 function ajx_keno_results_pattern_refresh($form, $form_state){
-    //lotto_results_n_stats_sync_by_draw_numbers($lottery_name);
+    lotto_results_n_stats_sync_by_draw_numbers("lotto_keno");
     
-    //$form['bets']['pattern_grid']['#markup'] = lotto_pattern_grid_create("lotto_keno");
-    $body = "<tr id='ajx_test' ><td>Ajaxadded</td>";
-    for($i=1; $i <= 80; $i++){
-	$body .= "<td>".$i."</td>";
-    }
-    $body .= "</tr>";
-    return $body;
-    //return $form['bets']['pattern_grid'];
+    $form['bets']['pattern_grid']['#markup'] = lotto_pattern_grid_create("lotto_keno");
+    
+    return $form['bets']['pattern_grid'];
 }
 
 function ajx_place_bets($form, &$form_state){

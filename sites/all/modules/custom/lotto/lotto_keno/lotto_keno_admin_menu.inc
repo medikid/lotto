@@ -11,7 +11,7 @@ function lotto_keno_menu(){
         'page arguments' => array('my_admin_function'),
         'access arguments' => array('administer site configuration'),
         );
-
+	/********************************CHARTS*************************************************/
         $items['admin/lotto/lottokeno/charts'] = array(
         'title' => 'Charts',
         'description' => 'Get charts',
@@ -19,23 +19,55 @@ function lotto_keno_menu(){
         'page arguments' => array('get_lotto_keno_charts_form'),
         'access arguments' => array('Access Lotto Max Charts'),
         );
-	
+	/********************************BETS*************************************************/
 	$items['admin/lotto/lottokeno/bets'] = array(
-        'title' => 'Bets Review',
+        'title' => 'Bets',
+        'description' => 'Bets',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('get_lotto_keno_bets_review_form'),
+        'access arguments' => array('Access Lotto Max Charts'),
+        );
+	
+	$items['admin/lotto/lottokeno/bets/review'] = array(
+        'title' => 'Review',
         'description' => 'Review Bets',
         'page callback' => 'drupal_get_form',
         'page arguments' => array('get_lotto_keno_bets_review_form'),
         'access arguments' => array('Access Lotto Max Charts'),
         );
 	
+	$items['admin/lotto/lottokeno/bets/autopicks'] = array(
+        'title' => 'Autopicks',
+        'description' => 'Autopicks',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('get_lotto_keno_autopicks_form'),
+        'access arguments' => array('Access Lotto Max Charts'),
+        );
+	
+	$items['admin/lotto/lottokeno/bets/autopicks/efficiency'] = array(
+        'title' => 'Efficiency',
+        'description' => 'Review Autopicks Efficiency',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('get_lotto_keno_autopicks_efficiency_form'),
+        'access arguments' => array('Access Lotto Max Charts'),
+        );
+	
+	$items['admin/lotto/lottokeno/bets/autopicks/efficiency_t'] = array(
+        'title' => 'Efficiency_t',
+        'description' => 'Review Autopicks Efficiency',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('get_lotto_keno_autopicks_efficiency_form_t'),
+        'access arguments' => array('Access Lotto Max Charts'),
+        );
+	
 	$items['admin/lotto/lottokeno/bets/diagwins'] = array(
         'title' => 'Bets from Diag Wins Pattern',
-        'description' => 'Review Beets',
+        'description' => 'Review Bets',
         'page callback' => 'drupal_get_form',
         'page arguments' => array('get_lotto_keno_bets_diag_wins_form'),
         'access arguments' => array('Access Lotto Max Charts'),
         );
-	
+	/********************************RESULTS*************************************************/
 	$items['admin/lotto/lottokeno/results'] = array(
         'title' => 'Results',
         'description' => 'Get Results',
@@ -68,7 +100,7 @@ function lotto_keno_menu(){
         'access arguments' => array('Access Lotto Keno Charts'),
         );
 	
-	$items['admin/lotto/lottokeno/analysis'] = array(
+	$items['admin/lotto/lottokeno/results/analysis'] = array(
         'title' => 'Analysis',
         'description' => 'Analyze results',
         'page callback' => 'drupal_get_form',
