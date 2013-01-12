@@ -316,6 +316,75 @@ function lotto_patterns_diag_win_ratio_sorted($diag_wins_ratio){
     return $ratio_sorted;
 }
 
+function lotto_patterns_diag_win_numbers_sorted($lottery_name, $draw_num, $num_of_draws){
+    $diag_win_ratio = lotto_patterns_diag_win_ratio($lottery_name, $draw_num, $num_of_draws);
+    $diag_wins_ratio_sorted = lotto_patterns_diag_win_ratio_sorted($diag_win_ratio);
+    
+    $diag_win_numbers = array('stepup_nbrs'=>array(), 'stepdown_nbrs'=>array());
+    foreach($diag_wins_ratio_sorted as $rank=>$data){
+	foreach($data['backward'] as $num_b=>$ratio_b){
+	    $diag_win_numbers['stepup_nbrs'][$rank] = $num_b;
+	}
+	
+	foreach($data['forward'] as $num_f=>$ratio_f){
+	    $diag_win_numbers['stepdown_nbrs'][$rank] = $num_f;
+	}	
+    }
+    return $diag_win_numbers;
+}
+
+function lotto_patterns_diag_win_efficiency_numbers($lottery_name, $draw_num, $num_of_draws, $top_of=10){
+    $diag_win_numbers = lotto_patterns_diag_win_numbers_sorted($lottery_name, $draw_num, $num_of_draws);
+    $diag_win_efficiency_numbers=array();
+    for($i = 1; $i <= $top_of; $i++){
+	$diag_win_efficiency_numbers['stepup'][$i] = $diag_win_numbers['stepup_nbrs'][$i];
+	$diag_win_efficiency_numbers['stepdown'][$i] = $diag_win_numbers['stepdown_nbrs'][$i];
+	
+	if (($i % 2) == 0){
+	    $diag_win_efficiency_numbers['z2updown'][$i] = $diag_win_numbers['stepup_nbrs'][$i];
+	    $diag_win_efficiency_numbers['z1updown'][$i] = $diag_win_numbers['stepdown_nbrs'][$i];
+	} else {
+	    $diag_win_efficiency_numbers['z1updown'][$i] = $diag_win_numbers['stepup_nbrs'][$i];
+	    $diag_win_efficiency_numbers['z2updown'][$i] = $diag_win_numbers['stepdown_nbrs'][$i];
+	}
+    }
+    diag_win_efficiency_numbers_exclude_dups($diag_win_efficiency_numbers);
+    return $diag_win_efficiency_numbers;
+}
+
+function diag_win_efficiency_numbers_exclude_dups(&$diag_win_efficiency_numbers){
+    $dups = array();
+    $dup_entries = array();
+    foreach($diag_win_efficiency_numbers['stepup'] as $num){
+	if ( in_array($num, $diag_win_efficiency_numbers['stepdown']) ){
+	    array_push($dups, $num);
+	}
+    }
+  if (count($dups) > 0)  {
+    foreach($dups as $num_d){
+	if( in_array($num_d, $diag_win_efficiency_numbers['z2updown'])){
+	    $pos_d = array_search($num_d, $diag_win_efficiency_numbers['z2updown']);
+	    unset($diag_win_efficiency_numbers['z2updown'][$pos_d]);
+	} else {
+	    $z1updown_unique = array_unique($diag_win_efficiency_numbers['z1updown']);
+	    $dup_entries = array_diff_key($diag_win_efficiency_numbers['z1updown'], $z1updown_unique);
+	}
+    }
+  }
+  if (count($dup_entries) > 0)  {  
+    foreach($dup_entries as $key=>$num_dup){
+	unset($diag_win_efficiency_numbers['z1updown'][$key]);
+	if(array_key_exists($key, $diag_win_efficiency_numbers['z2updown'])){
+	    $diag_win_efficiency_numbers['z1updown'][$key] = $diag_win_efficiency_numbers['z2updown'][$key];
+	    unset($diag_win_efficiency_numbers['z2updown'][$key]);	    
+	} else{
+	    $key_prev = $key - 1;
+	    $diag_win_efficiency_numbers['z1updown'][$key] = $diag_win_efficiency_numbers['z2updown'][$key_prev];
+	    unset($diag_win_efficiency_numbers['z2updown'][$key_prev]);
+	}   
+	}
+    }
+}
 function lotto_patterns_diag_win_pattern_grid_create($lottery_name, $draw_number, $num_of_results = 80, $draw_num_to_validate = null){
     
     if ( $draw_num_to_validate == null){

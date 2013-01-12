@@ -68,15 +68,13 @@ function lotto_keno_result_load($keno_id){
 }
 
 function lotto_keno_result_by_draw_num($draw_num){
-    $query = db_select('lotto_keno', 'lk')
+    $result = db_select('lotto_keno', 'lk')
 			->fields('lk')
 			->condition('draw_number', $draw_num)
-			 ->execute();
-    $lotto_result = array();
-    while ($result = $query->fetchAssoc()){
-	array_push($lotto_result, $result);
-    }			 
-    return $lotto_result; 
+			 ->execute()
+			->fetchAssoc();
+    			 
+    return $result; 
 }
 
 function lotto_keno_stats_exists($stat_type, $result_id){
