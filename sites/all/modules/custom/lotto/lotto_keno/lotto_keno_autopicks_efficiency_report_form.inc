@@ -406,4 +406,80 @@ function ajx_autopicks_efficiency_report($form, $form_state){
 
     return $form['efficiency']['efficiency_report']['report'];
 }
+
+
+function diagwin_numbers_validate($diag_win_nbrs, $lotto_results, $category, $number_offset=1){
+    $validation_data = array(
+	'match'=>0,
+	'count'=>count($diag_win_nbrs)
+    );
+    switch($category){
+	case 'stepup':
+	    foreach($diagwin_nbrs as $num_su){
+		$corresponding_num = $num_su + 1;
+		if ($corresponding_num <= 80){
+		    if(in_array($corresponding_num, $lotto_results)){
+			$validation_data['match']++;
+		    }
+		}
+	    }
+	    break;
+	case 'stepdown':
+	    foreach($diagwin_nbrs as $num_sd){
+		$corresponding_num = $num_sd - 1;
+		if ($corresponding_num > 0){
+		    if(in_array($corresponding_num, $lotto_results)){
+			$validation_data['match']++;
+		    }
+		}
+	    }
+	    break;
+	case 'z1updown':
+	    $i=1;
+	    foreach($diagwin_nbrs as $num_z1){
+		if ($i == 1){
+		    $corresponding_num = $num_sd + 1;
+		    if ($corresponding_num <= 80 ){
+			if(in_array($corresponding_num, $lotto_results)){
+			    $validation_data['match']++;
+			}
+		    }
+		    $i = 0;
+		} elseif ($i == 0){
+		    $corresponding_num = $num_sd - 1;
+		    if ($corresponding_num > 0){
+			if(in_array($corresponding_num, $lotto_results)){
+			    $validation_data['match']++;
+			}
+		    }
+		    $i = 1;		    
+		}		
+	    }
+	    break;
+	case 'z2updown':
+	    $i = 0;
+	    foreach($diagwin_nbrs as $num_z1){
+		if ($i == 1){
+		    $corresponding_num = $num_sd + 1;
+		    if ($corresponding_num <= 80 ){
+			if(in_array($corresponding_num, $lotto_results)){
+			    $validation_data['match']++;
+			}
+		    }
+		    $i = 0;
+		} elseif ($i == 0){
+		    $corresponding_num = $num_sd - 1;
+		    if ($corresponding_num > 0){
+			if(in_array($corresponding_num, $lotto_results)){
+			    $validation_data['match']++;
+			}
+		    }
+		    $i = 1;		    
+		}		
+	    }
+	    break;
+    }
+    
+    return $validation_data;
+}
 ?>
