@@ -64,7 +64,7 @@ function lotto_results_n_stats_sync_by_draw_numbers($lottery_name){
 		}
 		//just in case call the latest draw
 		//lotto_results_sync_latestdraw($lottery_name);
-		
+		lotto_stats_get_uptodate($lottery_name);
 		return true;
 	    }
 	    break;

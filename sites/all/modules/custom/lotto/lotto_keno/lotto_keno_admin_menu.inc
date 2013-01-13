@@ -49,6 +49,8 @@ function lotto_keno_menu(){
         'description' => 'Review Autopicks Efficiency',
         'page callback' => 'drupal_get_form',
         'page arguments' => array('get_lotto_keno_autopicks_efficiency_form'),
+	//'page callback' => 'get_lotto_keno_autopicks_efficiency_form',
+        //'page arguments' => array('draw_num'),
         'access arguments' => array('Access Lotto Max Charts'),
         );
 	

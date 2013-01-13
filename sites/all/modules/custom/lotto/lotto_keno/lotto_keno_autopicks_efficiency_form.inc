@@ -4,7 +4,9 @@ function get_lotto_keno_autopicks_efficiency_form(){
     drupal_add_css(drupal_get_path('module', 'lotto_core') . '/css/number_grid.css', array('group' => CSS_DEFAULT, 'type' => 'file'));
     
     $form = array();
-    $last_keno_draw_num = get_last_keno_drawnumber("lotto_keno");
+    if (isset($draw_num)){
+	$last_keno_draw_num = $draw_num;
+    } else $last_keno_draw_num = get_last_keno_drawnumber("lotto_keno");
     $num_of_draws_default = 50;
     
     $form['efficiency']=array(
@@ -123,7 +125,27 @@ function get_lotto_keno_autopicks_efficiency_form(){
 	'#prefix'=>'<div id="ajx_keno_diag_wins_pattern_wrapper" >',
 	'#suffix'=>'</div>'
     );
-    
+    $form['efficiency']['pillar_wins']=array(
+	'#type'=>  'fieldset',
+	'#title'=>t("Pillarwins:"),
+	'#collapsible'=>true,
+	'#collapsed'=>false
+    );
+ 
+     $form['efficiency']['pillar_wins']['number_of_draws'] = array(
+	'#type'=>'textfield',
+	'#title'=>t('Number Of Draws to Review: '),
+	'#default_value'=>$num_of_draws_default,
+	'#size'=>5,
+	'#prefix'=>'<div class="container-inline">',
+	'#suffix'=>'</div>'
+    );
+     
+     $form['efficiency']['pillar_wins']['pillar_wins_pattern'] = array(
+	'#markup'=>'',//lotto_patterns_diag_win_pattern_grid_create("lotto_keno", $last_keno_draw_num, $num_of_draws_default, $last_keno_draw_num + 1),
+	'#prefix'=>'<div id="ajx_keno_diag_wins_pattern_wrapper" >',
+	'#suffix'=>'</div>'
+    );
     
      
     return $form;
@@ -176,7 +198,7 @@ function ajx_autopicks_efficiency_refresh($form, $form_state){
     $draw_number = $form_state['values']['draw_number'];
     $num_of_draws = $form_state['values']['number_of_draws'];
     $show_result_patterns = $form_state['values']['show_result_patterns'];
-    $draw_number_val = $form_state['values']['validate_with_draw'];
+    $draw_number_val = $draw_number + 1;
     
     if ($show_result_patterns == 1){
 	$form['efficiency']['results']['results_grid']['#markup'] = get_lotto_patterns_result_grid($form, $form_state);

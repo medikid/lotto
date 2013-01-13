@@ -265,6 +265,74 @@ function lotto_patterns_autopicks_efficiency_report_data($lottery_name, $draw_nu
     return $report_data; 
 }
 
+function lotto_patterns_autopicks_efficiency_report_data_t($lottery_name, $draw_num, $draw_num_val){
+    $report_numbers = get_autopicks_efficiency_report_numbers($lottery_name, $draw_num, $draw_num_val);
+    $report_data = array();
+    $report_data['draw_details'] = $report_numbers['draw_details'];
+    
+    $lotto_results = $report_numbers['lotto_results'];
+    /*********************AUTOPICKs***********************************/
+    $autopicks = $report_numbers['autopick_nbrs'];    
+    
+    $report_data['autopicks']['diagonal']['match'] = 0;
+    $report_data['autopicks']['diagonal']['count'] = count($autopicks['diagonal']);    
+    foreach( $autopicks['diagonal'] as $num_d){
+	if (in_array($num_d, $lotto_results)){
+	   $report_data['autopicks']['diagonal']['match']++;
+	}
+    }
+    
+    $report_data['autopicks']['ladder']['match'] = 0;
+    $report_data['autopicks']['ladder']['count'] = count($autopicks['ladder']);    
+    foreach( $autopicks['ladder'] as $num_l){
+	if (in_array($num_d, $lotto_results)){
+	   $report_data['autopicks']['ladder']['match']++;
+	}
+    }
+    
+    /*********************Diagwin5***********************************/
+    $diagwin5 = $report_numbers['diagwin5'];
+    
+    $report_data['diagwin5']['stepup'] = diagwin_numbers_validate($diagwin5['stepup'], $lotto_results, 'stepup');
+    $report_data['diagwin5']['stepdown'] = diagwin_numbers_validate($diagwin5['stepdown'], $lotto_results, 'stepdown');
+    $report_data['diagwin5']['z1updown'] = diagwin_numbers_validate($diagwin5['z1updown'], $lotto_results, 'z1updown');
+    $report_data['diagwin5']['z2updown'] = diagwin_numbers_validate($diagwin5['z2updown'], $lotto_results, 'z2updown');
+    
+     /*********************Diagwin10***********************************/
+    $diagwin10 = $report_numbers['diagwin10'];
+    
+    $report_data['diagwin10']['stepup'] = diagwin_numbers_validate($diagwin10['stepup'], $lotto_results, 'stepup');
+    $report_data['diagwin10']['stepdown'] = diagwin_numbers_validate($diagwin10['stepdown'], $lotto_results, 'stepdown');
+    $report_data['diagwin10']['z1updown'] = diagwin_numbers_validate($diagwin10['z1updown'], $lotto_results, 'z1updown');
+    $report_data['diagwin10']['z2updown'] = diagwin_numbers_validate($diagwin10['z2updown'], $lotto_results, 'z2updown');
+    
+     /*********************Diagwin20***********************************/
+    $diagwin20 = $report_numbers['diagwin20'];
+    
+    $report_data['diagwin20']['stepup'] = diagwin_numbers_validate($diagwin20['stepup'], $lotto_results, 'stepup');
+    $report_data['diagwin20']['stepdown'] = diagwin_numbers_validate($diagwin20['stepdown'], $lotto_results, 'stepdown');
+    $report_data['diagwin20']['z1updown'] = diagwin_numbers_validate($diagwin20['z1updown'], $lotto_results, 'z1updown');
+    $report_data['diagwin20']['z2updown'] = diagwin_numbers_validate($diagwin20['z2updown'], $lotto_results, 'z2updown');
+    
+     /*********************Diagwin50***********************************/
+    $diagwin50 = $report_numbers['diagwin50'];
+    
+    $report_data['diagwin50']['stepup'] = diagwin_numbers_validate($diagwin50['stepup'], $lotto_results, 'stepup');
+    $report_data['diagwin50']['stepdown'] = diagwin_numbers_validate($diagwin50['stepdown'], $lotto_results, 'stepdown');
+    $report_data['diagwin50']['z1updown'] = diagwin_numbers_validate($diagwin50['z1updown'], $lotto_results, 'z1updown');
+    $report_data['diagwin50']['z2updown'] = diagwin_numbers_validate($diagwin50['z2updown'], $lotto_results, 'z2updown');
+   
+     /*********************Diagwin100***********************************/
+    $diagwin100 = $report_numbers['diagwin100'];
+    
+    $report_data['diagwin100']['stepup'] = diagwin_numbers_validate($diagwin100['stepup'], $lotto_results, 'stepup');
+    $report_data['diagwin100']['stepdown'] = diagwin_numbers_validate($diagwin100['stepdown'], $lotto_results, 'stepdown');
+    $report_data['diagwin100']['z1updown'] = diagwin_numbers_validate($diagwin100['z1updown'], $lotto_results, 'z1updown');
+    $report_data['diagwin100']['z2updown'] = diagwin_numbers_validate($diagwin100['z2updown'], $lotto_results, 'z2updown');
+    
+     return $report_data;
+}
+
 function get_autopicks_efficiency_report_numbers($lottery_name, $draw_num, $draw_num_val){
     $draw = lotto_keno_result_by_draw_num($draw_num);
     
@@ -396,27 +464,143 @@ function get_lotto_patterns_autopicks_efficiency_report($lottery_name, $draw_num
     return $autopicks_efficiency_report;
 }
 
+function get_lotto_patterns_autopicks_efficiency_report_t($lottery_name, $draw_num, $draw_num_val, $num_of_draws){
+    $header = "<table><tbody>";
+    
+    $labels1 = "<tr>";
+    $labels1 .="<th></th>";
+    $labels1 .="<th colspan='2' >DrawDetails</th>";
+    $labels1 .="<th class='black' ></th>";
+    $labels1 .="<th colspan='2' >Autopicks</th>";
+    $labels1 .="<th class='black' ></th>";
+    $labels1 .="<th colspan='4' >DiagWin5</th>";
+    $labels1 .="<th class='black' ></th>";
+    $labels1 .="<th colspan='4' >DiagWin10</th>";
+    $labels1 .="<th class='black' ></th>";
+    $labels1 .="<th colspan='4' >DiagWin20</th>";
+    $labels1 .="<th class='black' ></th>";
+    $labels1 .="<th colspan='4' >DiagWin50</th>";
+    $labels1 .="<th class='black' ></th>";
+    $labels1 .="<th colspan='4' >DiagWin100</th>";
+    $labels1 .="</tr>";
+    
+    $labels2 = "<tr>";
+    $labels2 .="<th></th>";
+    $labels2 .="<th>Draw#</th><th>DrawTime</th>";
+    $labels2 .="<th class='black' ></th>";
+    $labels2 .="<th>Diagonal</th><th>Ladder</th>";
+    $labels2 .="<th class='black' ></th>";
+    $labels2 .="<th>StepUp</th><th>StepDown</th><th>Z1-Up-Down</th><th>Z2-Up-Down</th>";
+    $labels2 .="<th class='black' ></th>";
+    $labels2 .="<th>StepUp</th><th>StepDown</th><th>Z1-Up-Down</th><th>Z2-Up-Down</th>";
+    $labels2 .="<th class='black' ></th>";
+    $labels2 .="<th>StepUp</th><th>StepDown</th><th>Z1-Up-Down</th><th>Z2-Up-Down</th>";
+    $labels2 .="<th class='black' ></th>";
+    $labels2 .="<th>StepUp</th><th>StepDown</th><th>Z1-Up-Down</th><th>Z2-Up-Down</th>";
+    $labels2 .="<th class='black' ></th>";
+    $labels2 .="<th>StepUp</th><th>StepDown</th><th>Z1-Up-Down</th><th>Z2-Up-Down</th>";
+    $labels2 .="</tr>";
+    
+    $report = "";
+    
+    for($i=0; $i < $num_of_draws; $i++){
+	$draw_num_i = $draw_num - $i;
+	$draw_num_val_i = $draw_num_val - $i;
+	$report_data = lotto_patterns_autopicks_efficiency_report_data($lottery_name, $draw_num_i, $draw_num_val_i);
+	$report_data_t = lotto_patterns_autopicks_efficiency_report_data_t($lottery_name, $draw_num_i, $draw_num_val_i);
+	
+	$report .= "<tr>";
+	$report .="<th>".$i."</th>";
+
+	$report .="<td>".$report_data['draw_details']['draw_num']."</td>";
+	$report .="<td>".$report_data['draw_details']['draw_time']."</td>";
+	$report .="<th class='black' ></td>";
+
+	$report .="<td>".$report_data['autopicks']['diagonal']['match']."</td>";
+	$report .="<td>".$report_data['autopicks']['ladder']['match']."</td>";
+	$report .="<th class='black' ></td>";
+
+
+	$report .="<td>".$report_data['diagwin5']['stepup']['match']."(".$report_data_t['diagwin5']['stepup']['match'];
+	$report .= ($report_data_t['diagwin5']['stepup']['count'] == 10) ?  ")</td>" : " / ".$report_data_t['diagwin5']['stepup']['count'].")</td>";
+	$report .="<td>".$report_data['diagwin5']['stepdown']['match']."(".$report_data_t['diagwin5']['stepdown']['match'];
+	$report .= ($report_data_t['diagwin5']['stepdown']['count'] == 10) ?   ")</td>" : " / ".$report_data_t['diagwin5']['stepdown']['count'].")</td>";
+	$report .= "<td>".$report_data['diagwin5']['z1updown']['match']."(".$report_data_t['diagwin5']['z1updown']['match'];
+	$report .= ($report_data_t['diagwin5']['z1updown']['count'] == 10) ?   ")</td>" : " / ".$report_data_t['diagwin5']['z1updown']['count'].")</td>";
+	$report .="<td>".$report_data['diagwin5']['z2updown']['match']."(".$report_data_t['diagwin5']['z2updown']['match'];
+	$report .=($report_data_t['diagwin5']['z2updown']['count'] == 10) ?   ")</td>" : " / ".$report_data_t['diagwin5']['z2updown']['count'].")</td>";
+	$report .="<th class='black' ></td>";
+
+	$report .="<td>".$report_data['diagwin10']['stepup']['match']."(".$report_data_t['diagwin10']['stepup']['match'];
+	$report .= ($report_data_t['diagwin10']['stepup']['count'] == 10) ?  ")</td>" : " / ".$report_data_t['diagwin10']['stepup']['count'].")</td>";
+	$report .="<td>".$report_data['diagwin10']['stepdown']['match']."(".$report_data_t['diagwin10']['stepdown']['match'];
+	$report .= ($report_data_t['diagwin10']['stepdown']['count'] == 10) ?   ")</td>" : " / ".$report_data_t['diagwin10']['stepdown']['count'].")</td>";
+	$report .= "<td>".$report_data['diagwin10']['z1updown']['match']."(".$report_data_t['diagwin10']['z1updown']['match'];
+	$report .= ($report_data_t['diagwin10']['z1updown']['count'] == 10) ?   ")</td>" : " / ".$report_data_t['diagwin10']['z1updown']['count'].")</td>";
+	$report .="<td>".$report_data['diagwin10']['z2updown']['match']."(".$report_data_t['diagwin10']['z2updown']['match'];
+	$report .=($report_data_t['diagwin10']['z2updown']['count'] == 10) ?   ")</td>" : " / ".$report_data_t['diagwin10']['z2updown']['count'].")</td>";
+	$report .="<th class='black' ></td>";
+
+	$report .="<td>".$report_data['diagwin20']['stepup']['match']."(".$report_data_t['diagwin20']['stepup']['match'];
+	$report .= ($report_data_t['diagwin20']['stepup']['count'] == 10) ?  ")</td>" : " / ".$report_data_t['diagwin20']['stepup']['count'].")</td>";
+	$report .="<td>".$report_data['diagwin20']['stepdown']['match']."(".$report_data_t['diagwin20']['stepdown']['match'];
+	$report .= ($report_data_t['diagwin20']['stepdown']['count'] == 10) ?   ")</td>" : " / ".$report_data_t['diagwin20']['stepdown']['count'].")</td>";
+	$report .= "<td>".$report_data['diagwin20']['z1updown']['match']."(".$report_data_t['diagwin20']['z1updown']['match'];
+	$report .= ($report_data_t['diagwin20']['z1updown']['count'] == 10) ?   ")</td>" : " / ".$report_data_t['diagwin20']['z1updown']['count'].")</td>";
+	$report .="<td>".$report_data['diagwin20']['z2updown']['match']."(".$report_data_t['diagwin20']['z2updown']['match'];
+	$report .=($report_data_t['diagwin20']['z2updown']['count'] == 10) ?   ")</td>" : " / ".$report_data_t['diagwin20']['z2updown']['count'].")</td>";
+	$report .="<th class='black' ></td>";
+
+	$report .="<td>".$report_data['diagwin50']['stepup']['match']."(".$report_data_t['diagwin50']['stepup']['match'];
+	$report .= ($report_data_t['diagwin50']['stepup']['count'] == 10) ?  ")</td>" : " / ".$report_data_t['diagwin50']['stepup']['count'].")</td>";
+	$report .="<td>".$report_data['diagwin50']['stepdown']['match']."(".$report_data_t['diagwin50']['stepdown']['match'];
+	$report .= ($report_data_t['diagwin50']['stepdown']['count'] == 10) ?   ")</td>" : " / ".$report_data_t['diagwin50']['stepdown']['count'].")</td>";
+	$report .= "<td>".$report_data['diagwin50']['z1updown']['match']."(".$report_data_t['diagwin50']['z1updown']['match'];
+	$report .= ($report_data_t['diagwin50']['z1updown']['count'] == 10) ?   ")</td>" : " / ".$report_data_t['diagwin50']['z1updown']['count'].")</td>";
+	$report .="<td>".$report_data['diagwin50']['z2updown']['match']."(".$report_data_t['diagwin50']['z2updown']['match'];
+	$report .=($report_data_t['diagwin50']['z2updown']['count'] == 10) ?   ")</td>" : " / ".$report_data_t['diagwin50']['z2updown']['count'].")</td>";
+	$report .="<th class='black' ></td>";
+
+	$report .="<td>".$report_data['diagwin100']['stepup']['match']."(".$report_data_t['diagwin100']['stepup']['match'];
+	$report .= ($report_data_t['diagwin100']['stepup']['count'] == 10) ?  ")</td>" : " / ".$report_data_t['diagwin100']['stepup']['count'].")</td>";
+	$report .="<td>".$report_data['diagwin100']['stepdown']['match']."(".$report_data_t['diagwin100']['stepdown']['match'];
+	$report .= ($report_data_t['diagwin100']['stepdown']['count'] == 10) ?   ")</td>" : " / ".$report_data_t['diagwin100']['stepdown']['count'].")</td>";
+	$report .= "<td>".$report_data['diagwin100']['z1updown']['match']."(".$report_data_t['diagwin100']['z1updown']['match'];
+	$report .= ($report_data_t['diagwin100']['z1updown']['count'] == 10) ?   ")</td>" : " / ".$report_data_t['diagwin100']['z1updown']['count'].")</td>";
+	$report .="<td>".$report_data['diagwin100']['z2updown']['match']."(".$report_data_t['diagwin100']['z2updown']['match'];
+	$report .=($report_data_t['diagwin100']['z2updown']['count'] == 10) ?   ")</td>" : " / ".$report_data_t['diagwin100']['z2updown']['count'].")</td>";
+	
+	$report .="</tr>";
+	
+    }
+ 
+    $footer .= "</tbody></table>";
+    
+    $autopicks_efficiency_report = $header.$labels1.$labels2.$report.$footer;
+    
+    return $autopicks_efficiency_report;
+}
 function ajx_autopicks_efficiency_report($form, $form_state){
     $draw_num = $form_state['values']['draw_number'];
     $draw_num_val = $draw_num + 1;
     $num_of_draws = $form_state['values']['num_of_draws'];
     
-    $autopicks_efficiency_report = get_lotto_patterns_autopicks_efficiency_report("lotto_keno", $draw_num, $draw_num_val, $num_of_draws);
+    $autopicks_efficiency_report = get_lotto_patterns_autopicks_efficiency_report_t("lotto_keno", $draw_num, $draw_num_val, $num_of_draws);
     $form['efficiency']['efficiency_report']['report']['#markup']=$autopicks_efficiency_report;
 
     return $form['efficiency']['efficiency_report']['report'];
 }
 
 
-function diagwin_numbers_validate($diag_win_nbrs, $lotto_results, $category, $number_offset=1){
+function diagwin_numbers_validate($diagwin_nbrs, $lotto_results, $category, $number_offset=1){
     $validation_data = array(
 	'match'=>0,
-	'count'=>count($diag_win_nbrs)
+	'count'=>count($diagwin_nbrs)
     );
     switch($category){
 	case 'stepup':
 	    foreach($diagwin_nbrs as $num_su){
-		$corresponding_num = $num_su + 1;
+		$corresponding_num = $num_su + $number_offset;
 		if ($corresponding_num <= 80){
 		    if(in_array($corresponding_num, $lotto_results)){
 			$validation_data['match']++;
@@ -426,7 +610,7 @@ function diagwin_numbers_validate($diag_win_nbrs, $lotto_results, $category, $nu
 	    break;
 	case 'stepdown':
 	    foreach($diagwin_nbrs as $num_sd){
-		$corresponding_num = $num_sd - 1;
+		$corresponding_num = $num_sd - $number_offset;
 		if ($corresponding_num > 0){
 		    if(in_array($corresponding_num, $lotto_results)){
 			$validation_data['match']++;
@@ -438,7 +622,7 @@ function diagwin_numbers_validate($diag_win_nbrs, $lotto_results, $category, $nu
 	    $i=1;
 	    foreach($diagwin_nbrs as $num_z1){
 		if ($i == 1){
-		    $corresponding_num = $num_sd + 1;
+		    $corresponding_num = $num_z1 + $number_offset;
 		    if ($corresponding_num <= 80 ){
 			if(in_array($corresponding_num, $lotto_results)){
 			    $validation_data['match']++;
@@ -446,7 +630,7 @@ function diagwin_numbers_validate($diag_win_nbrs, $lotto_results, $category, $nu
 		    }
 		    $i = 0;
 		} elseif ($i == 0){
-		    $corresponding_num = $num_sd - 1;
+		    $corresponding_num = $num_z1 - $number_offset;
 		    if ($corresponding_num > 0){
 			if(in_array($corresponding_num, $lotto_results)){
 			    $validation_data['match']++;
@@ -458,9 +642,9 @@ function diagwin_numbers_validate($diag_win_nbrs, $lotto_results, $category, $nu
 	    break;
 	case 'z2updown':
 	    $i = 0;
-	    foreach($diagwin_nbrs as $num_z1){
+	    foreach($diagwin_nbrs as $num_z2){
 		if ($i == 1){
-		    $corresponding_num = $num_sd + 1;
+		    $corresponding_num = $num_z2 + $number_offset;
 		    if ($corresponding_num <= 80 ){
 			if(in_array($corresponding_num, $lotto_results)){
 			    $validation_data['match']++;
@@ -468,7 +652,7 @@ function diagwin_numbers_validate($diag_win_nbrs, $lotto_results, $category, $nu
 		    }
 		    $i = 0;
 		} elseif ($i == 0){
-		    $corresponding_num = $num_sd - 1;
+		    $corresponding_num = $num_z2 - $number_offset;
 		    if ($corresponding_num > 0){
 			if(in_array($corresponding_num, $lotto_results)){
 			    $validation_data['match']++;
