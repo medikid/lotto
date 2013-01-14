@@ -142,8 +142,8 @@ function get_lotto_keno_autopicks_efficiency_form(){
     );
      
      $form['efficiency']['pillar_wins']['pillar_wins_pattern'] = array(
-	'#markup'=>'',//lotto_patterns_diag_win_pattern_grid_create("lotto_keno", $last_keno_draw_num, $num_of_draws_default, $last_keno_draw_num + 1),
-	'#prefix'=>'<div id="ajx_keno_diag_wins_pattern_wrapper" >',
+	'#markup'=>lotto_patterns_pillar_win_pattern_grid_create("lotto_keno", $last_keno_draw_num, $num_of_draws_default, $last_keno_draw_num + 1),
+	'#prefix'=>'<div id="ajx_keno_pillar_wins_pattern_wrapper" >',
 	'#suffix'=>'</div>'
     );
     
@@ -168,7 +168,7 @@ function ajx_draw_number_prev($form, $form_state){
     }
     $form['efficiency']['autopicks']['numbers']['#markup'] = lotto_patterns_autopicks_grid_create($lottery_name, $draw_number_prev, $draw_number_val);
     $form['efficiency']['diag_wins']['diag_wins_pattern']['#markup'] = lotto_patterns_diag_win_pattern_grid_create($lottery_name, $draw_number_prev, $num_of_draws, $draw_number_val);
-    
+    $form['efficiency']['pillar_wins']['pillar_wins_pattern']['#markup'] = lotto_patterns_pillar_win_pattern_grid_create($lottery_name, $draw_number_prev, $num_of_draws, $draw_number_val);
     return $form['efficiency'];
 }
 
@@ -189,7 +189,7 @@ function ajx_draw_number_next($form, $form_state){
     }
     $form['efficiency']['autopicks']['numbers']['#markup'] = lotto_patterns_autopicks_grid_create("lotto_keno", $draw_number_next, $draw_number_val);
     $form['efficiency']['diag_wins']['diag_wins_pattern']['#markup'] = lotto_patterns_diag_win_pattern_grid_create($lottery_name, $draw_number_next, $num_of_draws, $draw_number_val);
-    
+    $form['efficiency']['pillar_wins']['pillar_wins_pattern']['#markup'] = lotto_patterns_pillar_win_pattern_grid_create($lottery_name, $draw_number_next, $num_of_draws, $draw_number_val);
     return $form['efficiency'];
 }
 
@@ -205,7 +205,7 @@ function ajx_autopicks_efficiency_refresh($form, $form_state){
     }
     $form['efficiency']['autopicks']['numbers']['#markup'] = lotto_patterns_autopicks_grid_create("lotto_keno", $draw_number, $draw_number_val);
     $form['efficiency']['diag_wins']['diag_wins_pattern']['#markup'] = lotto_patterns_diag_win_pattern_grid_create($lottery_name, $draw_number, $num_of_draws, $draw_number_val);
-    
+    $form['efficiency']['pillar_wins']['pillar_wins_pattern']['#markup'] = lotto_patterns_pillar_win_pattern_grid_create($lottery_name, $draw_number, $num_of_draws, $draw_number_val);
     return $form['efficiency'];
 }
 

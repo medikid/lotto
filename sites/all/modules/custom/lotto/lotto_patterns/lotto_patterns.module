@@ -569,3 +569,47 @@ function lotto_patterns_grid_by_drawnum_create($lottery_name, $draw_num, $number
     
     return $patterns_grid;
 }
+
+function lotto_patterns_pillar_win_pattern_grid_create($lottery_name, $draw_number, $num_of_results = 100, $draw_num_to_validate = null){
+    
+    if ( $draw_num_to_validate == null){
+	$lotto_results = array();
+    } else {
+	$lotto_results = array();
+	$draw_results = lotto_results_by_draw_number($lottery_name, $draw_num_to_validate);
+	for($i=1; $i <= 20; $i++){
+	    array_push($lotto_results, $draw_results['n'.$i]);
+	}
+    }
+    
+    
+    $header = "<table class=\"pillar_wins_pattern_grid\"><tbody>";
+    
+    $body = "<tr>";
+    $body .= "<th>Rank</th>";
+    $body .= "<th>Number(Pillar Win)</th><th>Ratio</th><th>Wins / Count</th>";
+    $body .= "</tr>";
+    
+    $ratios_sorted = lotto_stats_each_number_frequency_ratio_sorted($lottery_name, $draw_number, $num_of_results);
+    
+    foreach($ratios_sorted as $rank=>$data){
+	$body .= "<tr>";
+	$body .= "<th>".$rank."</th>";
+	
+	foreach($data as $num=>$value){
+	    $body .= ( in_array($num, $lotto_results) ) ? "<td class=\"green\" >" : "<td>";
+	    $body .= $num."</td>";
+	    $body .= "<td>".$value['ratio']."</td>";
+	    $body .= "<td>".$value['wins']." / ".$value['count']."</td>";
+	}
+		
+	$body .= "</tr>";
+    }
+    
+    
+    
+    $footer = "</tbody></table>";
+    
+    $pillar_wins_pattern_grid = $header . $body . $footer;
+    return $pillar_wins_pattern_grid;    
+}

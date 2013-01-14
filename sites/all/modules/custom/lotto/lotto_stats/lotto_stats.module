@@ -928,3 +928,72 @@ function lotto_bets_grid_by_notes_create($lottery_name, $notes){
     
     return $html;
 }
+
+function lotto_stats_each_number_frequency_ratio($lottery_name, $draw_num, $num_of_draws){
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	    $ratio_config = lotto_stats_each_number_frequency_ratio_config($lottery_name);
+	    for($x=0; $x<$num_of_draws; $x++){
+		$current_draw_num = $draw_num - $x;
+		$current_draw_results = lotto_results_by_draw_number($lottery_name, $current_draw_num);
+		
+		for($y=1; $y <=20; $y++){
+		    $ratio_config[$current_draw_results['n'.$y]]['wins']++;
+		}
+	    }    
+	    
+	    foreach($ratio_config as $num=>$data){
+		$ratio_config[$num]['count'] = $num_of_draws;
+		$ratio_config[$num]['ratio'] = round(($data['wins'] / $num_of_draws), 3);
+	    }
+	    break;	
+    }
+    return $ratio_config;
+}
+
+function lotto_stats_each_number_frequency_ratio_sorted($lottery_name, $draw_num, $num_of_draws){
+    $frequency_ratio_sorted = array();
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	    $frequency_ratio = lotto_stats_each_number_frequency_ratio($lottery_name, $draw_num, $num_of_draws);
+	    $ratios = array();
+	    foreach($frequency_ratio as $num=>$data){
+		$ratios[$num] = $data['ratio'];
+	    }
+	    arsort($ratios);
+	    
+	    $i=1;
+	    foreach($ratios as $num=>$data){
+		$ratio_data = array($num=>$frequency_ratio[$num]);
+		$frequency_ratio_sorted[$i] = $ratio_data;
+		$i++;
+	    }
+	    
+	    break;
+    }
+    return $frequency_ratio_sorted;
+}
+
+function lotto_stats_each_number_frequency_ratio_config($lottery_name){
+    $config = array();
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	    
+	    for($i=1;$i <= 80; $i++){
+		$config[$i]=array(
+		    'wins'=>0,
+		    'count'=>0,
+		    'ratio'=>0
+		);
+	    }
+	    break;
+	
+    }
+    return $config;
+}
