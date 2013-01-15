@@ -274,8 +274,76 @@ function lotto_patterns_diag_win_ratio($lottery_name, $draw_number, $num_of_resu
 	
 	$x++;	    
     }
+    foreach ($diag_wins_ratio as $num => $data){
+	
+	$diag_wins_ratio[$num]['forward']['ratio'] = round(($data['forward']['wins'] / $data['forward']['count']), 3);
+	$diag_wins_ratio[$num]['backward']['ratio'] = round(($data['backward']['wins'] / $data['backward']['count']), 3);
+    }
+    
+    return $diag_wins_ratio;
+}
+    
+   function lotto_patterns_diag_win_ratio_spiral($lottery_name, $draw_number, $num_of_results = 80){    
+    
+    $diag_wins_ratio = lotto_patterns_diag_win_ratio_config($lottery_name);
     
     
+    $draw_num = $draw_number; $x=0; $y = $num_of_results; $z = 80; $stat_type = 3;
+    
+    $all_stats= array();
+    
+    while($x <= $num_of_results){
+	$current_draw_num = $draw_num - $x;
+	$current_stats = lotto_stats_by_draw_number($lottery_name, $current_draw_num, $stat_type);
+		
+	    for($num = 1; $num <= $z; $num++){
+
+		$current_num_forward = $num + $x;
+		if ($current_num_forward <= $z){
+		    if( $current_stats['s'.$current_num_forward] == 0){
+			$diag_wins_ratio[$num]['forward']['wins']++;
+		    }
+		    
+		   $diag_wins_ratio[$num]['forward']['count']++;
+		} else { //SPIRAL NUMBER STARTED
+		    $current_num_forward_spiral = $current_num_forward % 80;
+		    if ($current_num_forward_spiral == 0){
+			$current_num_forward_spiral = 80;
+		    }
+		    
+		    if( $current_stats['s'.$current_num_forward_spiral] == 0){
+			$diag_wins_ratio[$num]['forward']['wins']++;
+		    }
+		    
+		   $diag_wins_ratio[$num]['forward']['count']++;
+		
+		} //SPIRAL NUMBERING ENDS
+
+
+		$current_num_backward = $num - $x;
+		if ($current_num_backward > 0){
+		    if ( $current_stats['s'.$current_num_backward] == 0){
+			$diag_wins_ratio[$num]['backward']['wins']++;
+		    }
+		   $diag_wins_ratio[$num]['backward']['count']++;
+		} else { //SPIRAL NUMBER STARTED
+		    $current_num_backward_spiral = 80 + ($num_s % 80);
+		    if ($current_num_backward_spiral == 0){
+			$current_num_backward_spiral = 80;
+		    }
+		    
+		    if( $current_stats['s'.$current_num_backward_spiral] == 0){
+			$diag_wins_ratio[$num]['backward']['wins']++;
+		    }
+		    
+		   $diag_wins_ratio[$num]['backward']['count']++;
+		}//SPIRAL NUMBERING ENDS
+
+		
+	    }
+	
+	$x++;	    
+    }
     foreach ($diag_wins_ratio as $num => $data){
 	
 	$diag_wins_ratio[$num]['forward']['ratio'] = round(($data['forward']['wins'] / $data['forward']['count']), 3);
@@ -335,6 +403,7 @@ function lotto_patterns_diag_win_numbers_sorted($lottery_name, $draw_num, $num_o
 
 function lotto_patterns_diag_win_efficiency_numbers($lottery_name, $draw_num, $num_of_draws, $top_of=10){
     $diag_win_numbers = lotto_patterns_diag_win_numbers_sorted($lottery_name, $draw_num, $num_of_draws);
+    
     $diag_win_efficiency_numbers=array();
     for($i = 1; $i <= $top_of; $i++){
 	$diag_win_efficiency_numbers['stepup'][$i] = $diag_win_numbers['stepup_nbrs'][$i];
@@ -351,6 +420,31 @@ function lotto_patterns_diag_win_efficiency_numbers($lottery_name, $draw_num, $n
     diag_win_efficiency_numbers_exclude_dups($diag_win_efficiency_numbers);
     return $diag_win_efficiency_numbers;
 }
+
+function lotto_patterns_diag_win_efficiency_numbers_spiral($lottery_name, $draw_num, $num_of_draws, $top_of=10){
+    $diag_win_numbers = lotto_patterns_diag_win_numbers_sorted($lottery_name, $draw_num, $num_of_draws);
+    $pillar_win_numbers =  lotto_stats_each_number_frequency_ratio_sorted($lottery_name, $draw_num, $num_of_draws);
+    
+    $diag_win_efficiency_numbers=array();
+    for($i = 1; $i <= $top_of; $i++){
+	foreach($pillar_win_numbers[$i] as $num=>$data){
+	    $diag_win_efficiency_numbers['pillar'][$i] = $num;
+	}
+	$diag_win_efficiency_numbers['stepup'][$i] = $diag_win_numbers['stepup_nbrs'][$i];
+	$diag_win_efficiency_numbers['stepdown'][$i] = $diag_win_numbers['stepdown_nbrs'][$i];
+	
+	if (($i % 2) == 0){
+	    $diag_win_efficiency_numbers['z2updown'][$i] = $diag_win_numbers['stepup_nbrs'][$i];
+	    $diag_win_efficiency_numbers['z1updown'][$i] = $diag_win_numbers['stepdown_nbrs'][$i];
+	} else {
+	    $diag_win_efficiency_numbers['z1updown'][$i] = $diag_win_numbers['stepup_nbrs'][$i];
+	    $diag_win_efficiency_numbers['z2updown'][$i] = $diag_win_numbers['stepdown_nbrs'][$i];
+	}
+    }
+    diag_win_efficiency_numbers_exclude_dups($diag_win_efficiency_numbers);
+    return $diag_win_efficiency_numbers;
+}
+
 
 function diag_win_efficiency_numbers_exclude_dups(&$diag_win_efficiency_numbers){
     $dups = array();
@@ -408,6 +502,64 @@ function lotto_patterns_diag_win_pattern_grid_create($lottery_name, $draw_number
     $body .= "</tr>";
     
     $diag_wins_ratio = lotto_patterns_diag_win_ratio($lottery_name, $draw_number, $num_of_results);
+    $ratios_sorted = lotto_patterns_diag_win_ratio_sorted($diag_wins_ratio);
+    
+    foreach($ratios_sorted as $rank=>$data){
+	$body .= "<tr>";
+	$body .= "<th>".$rank."</th>";
+	
+	foreach($data['backward'] as $num_b=>$values_b){
+	    $body .= ( in_array($num_b, $lotto_results) ) ? "<td class=\"green\" >" : "<td>";
+	    $body .= $num_b."</td>";
+	    $body .= "<td>".$values_b['ratio']."</td>";
+	    $body .= "<td>".$values_b['wins']." / ".$values_b['count']."</td>";
+	}
+	
+	$body .= "<td></td><td></td>";
+	
+	foreach($data['forward'] as $num_f=>$values_f){
+	    $body .= ( in_array($num_f, $lotto_results) ) ? "<td class=\"green\" >" : "<td>";
+	    $body .= $num_f."</td>";
+	    $body .= "<td>".$values_f['ratio']."</td>";
+	    $body .= "<td>".$values_f['wins']." / ".$values_f['count']."</td>";
+	}
+	
+	
+	
+	$body .= "</tr>";
+    }
+    
+    
+    
+    $footer = "</tbody></table>";
+    
+    $diag_wins_pattern_grid = $header . $body . $footer;
+    return $diag_wins_pattern_grid;    
+}
+
+function lotto_patterns_diag_win_pattern_grid_create_spiral($lottery_name, $draw_number, $num_of_results = 80, $draw_num_to_validate = null){
+    
+    if ( $draw_num_to_validate == null){
+	$lotto_results = array();
+    } else {
+	$lotto_results = array();
+	$draw_results = lotto_results_by_draw_number($lottery_name, $draw_num_to_validate);
+	for($i=1; $i <= 20; $i++){
+	    array_push($lotto_results, $draw_results['n'.$i]);
+	}
+    }
+    
+    
+    $header = "<table class=\"diag_wins_pattern_grid\"><tbody>";
+    
+    $body = "<tr>";
+    $body .= "<th>Rank</th>";
+    $body .= "<th>Number(Step Up)</th><th>Ratio</th><th>Wins / Count</th>";
+    $body .= "<th></th><th></th>";
+    $body .= "<th>Number(Step Down)</th><th>Ratio</th><th>Wins / Count</th>";
+    $body .= "</tr>";
+    
+    $diag_wins_ratio = lotto_patterns_diag_win_ratio_spiral($lottery_name, $draw_number, $num_of_results);
     $ratios_sorted = lotto_patterns_diag_win_ratio_sorted($diag_wins_ratio);
     
     foreach($ratios_sorted as $rank=>$data){
