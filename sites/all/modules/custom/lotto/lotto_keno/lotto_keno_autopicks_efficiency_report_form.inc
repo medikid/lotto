@@ -584,7 +584,7 @@ function lotto_patterns_autopicks_efficiency_report_data_t($lottery_name, $draw_
      return $report_data;
 }
 
-function get_autopicks_efficiency_report_numbers($lottery_name, $draw_num, $draw_num_val){
+function get_autopicks_efficiency_report_numbers($lottery_name, $draw_num, $draw_num_val, $top_of=10){
     $draw = lotto_keno_result_by_draw_num($draw_num);
     
     
@@ -607,17 +607,17 @@ function get_autopicks_efficiency_report_numbers($lottery_name, $draw_num, $draw
 	    'diagonal'=>$autopicks['diagonal'],
 	    'ladder'=>$autopicks['ladder']
 	    ),
-	'diagwin5'=>lotto_patterns_diag_win_efficiency_numbers($lottery_name, $draw_num, 5, 10),
-	'diagwin10'=>lotto_patterns_diag_win_efficiency_numbers($lottery_name, $draw_num, 10, 10),
-	'diagwin20'=>lotto_patterns_diag_win_efficiency_numbers($lottery_name, $draw_num, 20, 10),
-	'diagwin50'=>lotto_patterns_diag_win_efficiency_numbers($lottery_name, $draw_num, 50, 10),
-	'diagwin100'=>lotto_patterns_diag_win_efficiency_numbers($lottery_name, $draw_num, 100, 10),
+	'diagwin5'=>lotto_patterns_diag_win_efficiency_numbers($lottery_name, $draw_num, 5, $top_of),
+	'diagwin10'=>lotto_patterns_diag_win_efficiency_numbers($lottery_name, $draw_num, 10, $top_of),
+	'diagwin20'=>lotto_patterns_diag_win_efficiency_numbers($lottery_name, $draw_num, 20, $top_of),
+	'diagwin50'=>lotto_patterns_diag_win_efficiency_numbers($lottery_name, $draw_num, 50, $top_of),
+	'diagwin100'=>lotto_patterns_diag_win_efficiency_numbers($lottery_name, $draw_num, 100, $top_of),
     );
     
     return $autopicks_efficiency_report_numbers;
 }
 
-function get_autopicks_efficiency_report_numbers_spiral($lottery_name, $draw_num, $draw_num_val){
+function get_autopicks_efficiency_report_numbers_spiral($lottery_name, $draw_num, $draw_num_val, $top_of=10){
     $draw = lotto_keno_result_by_draw_num($draw_num);
     
     
@@ -640,11 +640,11 @@ function get_autopicks_efficiency_report_numbers_spiral($lottery_name, $draw_num
 	    'diagonal'=>$autopicks['diagonal'],
 	    'ladder'=>$autopicks['ladder']
 	    ),
-	'diagwin5'=>lotto_patterns_diag_win_efficiency_numbers_spiral($lottery_name, $draw_num, 5, 10),
-	'diagwin10'=>lotto_patterns_diag_win_efficiency_numbers_spiral($lottery_name, $draw_num, 10, 10),
-	'diagwin20'=>lotto_patterns_diag_win_efficiency_numbers_spiral($lottery_name, $draw_num, 20, 10),
-	'diagwin50'=>lotto_patterns_diag_win_efficiency_numbers_spiral($lottery_name, $draw_num, 50, 10),
-	'diagwin100'=>lotto_patterns_diag_win_efficiency_numbers_spiral($lottery_name, $draw_num, 100, 10),
+	'diagwin5'=>lotto_patterns_diag_win_efficiency_numbers_spiral($lottery_name, $draw_num, 5, $top_of),
+	'diagwin10'=>lotto_patterns_diag_win_efficiency_numbers_spiral($lottery_name, $draw_num, 10, $top_of),
+	'diagwin20'=>lotto_patterns_diag_win_efficiency_numbers_spiral($lottery_name, $draw_num, 20, $top_of),
+	'diagwin50'=>lotto_patterns_diag_win_efficiency_numbers_spiral($lottery_name, $draw_num, 50, $top_of),
+	'diagwin100'=>lotto_patterns_diag_win_efficiency_numbers_spiral($lottery_name, $draw_num, 100, $top_of),
     );
     
     return $autopicks_efficiency_report_numbers;
