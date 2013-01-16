@@ -765,3 +765,32 @@ function lotto_patterns_pillar_win_pattern_grid_create($lottery_name, $draw_numb
     $pillar_wins_pattern_grid = $header . $body . $footer;
     return $pillar_wins_pattern_grid;    
 }
+
+
+function lotto_patterns_results_grid_create($lottery_name, $draw_num_val){
+    $header="<table class=\"results_grid\" ><tbody>";
+    $body="";
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	    $results = lotto_results_by_draw_number($lottery_name, $draw_num_val);
+	    $lotto_results = array();
+	    for($i=1; $i <= 20; $i++){
+		array_push($lotto_results, $results['n'.$i]);
+	    }
+	    $x=1; $y=10; $z=80;
+	    for($x=1; $x <= $z; $x++){
+		$body .= (($x % $y) == 1)? "<tr><td" : "<td";
+		$body .= (in_array($x, $lotto_results)) ? " class=\"green\" >" : ">";
+		$body .= $x;
+		$body .= (($x % $y) == 0)? "</td></tr>" : "</td>";
+	    }
+	    
+	    break;
+    }
+    
+    $footer = "</tbody></table>";
+    $results_grid =  $header . $body . $footer;
+    return $results_grid;
+}

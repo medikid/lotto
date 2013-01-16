@@ -116,6 +116,10 @@ function get_lotto_keno_autopicks_numbers_efficiency_form($form, &$form_state){
 	
     );
     
+    $form['efficiency']['numbers_pattern']['score_grid']=array(
+	'#markup'=>'',
+	
+    );
     return $form;
 }
 
@@ -157,27 +161,16 @@ function ajx_numbers_draw_number_next($form, $form_state){
 }
 
 
-function lotto_keno_autopicks_pillar_diagwin_numbers_pattern_grid_create_spiral($lottery_name, $draw_num, $draw_num_val, $top_of=10){
+function lotto_keno_autopicks_pillar_diagwin_numbers_pattern_grid_create_spiral($lottery_name, $autopicks_apd_numbers_spiral){
      $autopicks_numbers_pattern_grid = "";
      
 	switch($lottery_name){
 	    case 'lotto_max':
 		break;
 	    case 'lotto_keno':
-		$x=1; $y=80;
-		$report_data_spiral =   get_autopicks_efficiency_report_numbers_spiral($lottery_name, $draw_num, $draw_num_val, $top_of);
+		$x=1; $y=80; $scores=array();
+		$report_data_spiral = $autopicks_apd_numbers_spiral;
 		
-		
-		$header = "<table><tbody>";
-		$labels = "<tr><th></th>";
-		for($i=1; $i <= 80; $i++){
-		    $labels .= "<th";
-		    $labels .= ( in_array($i, $lotto_results)) ? " class=\"yellow\" >" : " >";
-		    $labels .= $i;
-		    $labels .= "</th>";
-		}
-		$labels .= "</tr>";
-
 		$lotto_results = $report_data_spiral['lotto_results'];
 		$autopicks = $report_data_spiral['autopick_nbrs'];
 		$diagwin5 = $report_data_spiral['diagwin5'];
@@ -186,6 +179,21 @@ function lotto_keno_autopicks_pillar_diagwin_numbers_pattern_grid_create_spiral(
 		$diagwin50 = $report_data_spiral['diagwin50'];
 		$diagwin100 = $report_data_spiral['diagwin100'];
 		
+		
+		
+		
+		$header = "<table><tbody>";
+		$labels = "<tr><th></th>";
+		for($i=1; $i <= 80; $i++){
+		    $labels .= "<th";
+		    $labels .= ( in_array($i, $lotto_results)) ? " class=\"selected\" >" : " >";
+		    $labels .= $i;
+		    $labels .= "</th>";
+		    
+		    $scores[$i] = 0;
+		}
+		$labels .= "</tr>";
+
 		$report ="";
 		
 		$report .= "<tr>";
@@ -348,8 +356,16 @@ function lotto_keno_autopicks_pillar_diagwin_numbers_pattern_grid_create_spiral(
 		    $report .=( in_array($x, $diagwin100['stepdown']) ) ? ( in_array($x, $lotto_results)) ? " class=\"green\" >".$x : " >".$x  : " class=\"grey\" >";
 		    $report .="</td>";
 		}
-		$report .= "</tr>";	
+		$report .= "</tr>";
 		
+		$report .= "<tr>";
+		$report .= "<th>Score-Ovrl</th>";
+		for($x=1; $x <= $y; $x++){
+		    $report .="<td>";
+		    $report .=$scores[$x];
+		    $report .="</td>";
+		}
+		$report .= "</tr>";
 		
 		
 		
@@ -364,14 +380,14 @@ function lotto_keno_autopicks_pillar_diagwin_numbers_pattern_grid_create_spiral(
 }
 
 
-function lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral($lottery_name, $draw_num, $draw_num_val, $top_of=10){
+function lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral($lottery_name, $autopicks_apd_numbers_spiral){
      $autopicks_numbers_grid = "";
      
 	switch($lottery_name){
 	    case 'lotto_max':
 		break;
 	    case 'lotto_keno':
-		$report_data_spiral =   get_autopicks_efficiency_report_numbers_spiral($lottery_name, $draw_num, $draw_num_val, $top_of);
+		$report_data_spiral =   $autopicks_apd_numbers_spiral;
 		
 		
 		$header = "<table><tbody>";
@@ -520,4 +536,98 @@ function lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral($lottery
      return $autopicks_numbers_grid;
 }
 
+function lotto_keno_autopicks_pillar_diagwin_numbers_score_grid_create_spiral($lottery_name, $autopicks_apd_numbers_spiral){
+    $score_grid = "";
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	    $x=1; $y=80; $scores=array();
+		$report_data_spiral = $autopicks_apd_numbers_spiral;
+		
+		$lotto_results = $report_data_spiral['lotto_results'];
+		$autopicks = $report_data_spiral['autopick_nbrs'];
+		$diagwin5 = $report_data_spiral['diagwin5'];
+		$diagwin10 = $report_data_spiral['diagwin10'];
+		$diagwin20 = $report_data_spiral['diagwin20'];
+		$diagwin50 = $report_data_spiral['diagwin50'];
+		$diagwin100 = $report_data_spiral['diagwin100'];
+		
+		
+	    $score_autopick = 100;
+		$score_5 = 5;
+		$score_10 = 10;
+		$score_20 = 20;
+		$score_50 = 50;
+		$score_100 = 100;
+		
+		
+		/*********************************************************/
+		foreach($autopicks['diagonal'] as $rank=>$num){
+		    $scores[$num] += $score_autopick;
+		}
+		foreach($autopicks['ladder'] as $rank=>$num){
+		    $scores[$num] += $score_autopick;
+		}
+		foreach($diagwin5 as $cat=>$data){
+		    foreach($data as $rank=>$num){
+		    $scores[$num] += $score_5;
+		    }		    
+		}
+		foreach($diagwin10 as $cat=>$data){
+		    foreach($data as $rank=>$num){
+		    $scores[$num] += $score_10;
+		    }		    
+		}
+		foreach($diagwin20 as $cat=>$data){
+		    foreach($data as $rank=>$num){
+		    $scores[$num] += $score_20;
+		    }		    
+		}
+		foreach($diagwin50 as $cat=>$data){
+		    foreach($data as $rank=>$num){
+		    $scores[$num] += $score_50;
+		    }		    
+		}
+		foreach($diagwin100 as $cat=>$data){
+		    foreach($data as $rank=>$num){
+		    $scores[$num] += $score_100;
+		    }		    
+		}
+		arsort($scores);
+		/*********************************************************/
+	    
+	    $header = "<table><tbody>";
+	    $labels = "<tr>";
+	    $labels .= "<th>Rank</th>";
+	    $labels .=  "<th>Overall</th>";
+	    $labels .=  "<th>Pillar</th>";
+	    $labels .=  "<th>Stepup</th>";
+	    $labels .= "<th>Stepdown</th>";;
+	    $labels .= "</tr>";
+	    
+	    $body = "";
+	    $rank=1;
+	    foreach($scores as $num=>$score){
+		$body .="</tr>";
+		$body .= "<th>".$rank."</th>";
+		$body .= "<td";
+		$body .= ">";
+		$body .=$num."(".$score.")";
+		$body .="</td>";
+		$body .="<td></td>";
+		$body .="<td></td>";
+		$body .="<td></td>";
+		$body .="</tr>";
+		
+		$rank++;
+	    }
+	    
+	    
+	    $footer .= "</tbody></table>";
+	    $score_grid = $header . $labels . $body . $footer;
+	    break;
+    }
+    return $score_grid;
+}
 ?>
