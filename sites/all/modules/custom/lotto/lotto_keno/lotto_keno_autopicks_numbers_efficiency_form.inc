@@ -7,10 +7,12 @@ function get_lotto_keno_autopicks_numbers_efficiency_form($form, &$form_state){
     $form = array();
     if (isset($draw_num)){
 	$last_keno_draw_num = $draw_num;
-    } else $last_keno_draw_num = get_last_keno_drawnumber("lotto_keno");
+    } else $last_keno_draw_num = get_last_keno_drawnumber("lotto_keno") - 1;
     $last_keno_draw_num_val = $last_keno_draw_num + 1;
-    $num_of_draws_default = 50;
+    $top_of = 10;
     
+    $numbers_spiral =  get_autopicks_efficiency_report_numbers_spiral("lotto_keno", $last_keno_draw_num, $last_keno_draw_num_val, $top_of);
+       
     $form['efficiency']=array(
 	'#type'=>  'fieldset',
 	'#title'=>t("Autopicks Numbers Efficiency:"),
@@ -97,7 +99,7 @@ function get_lotto_keno_autopicks_numbers_efficiency_form($form, &$form_state){
     );
     
     $form['efficiency']['numbers']['grid']=array(
-	'#markup'=>lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral("lotto_keno", $last_keno_draw_num-1, $last_keno_draw_num_val-1, 15),
+	'#markup'=>lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral("lotto_keno", $numbers_spiral)
 	
     );
     
@@ -112,13 +114,22 @@ function get_lotto_keno_autopicks_numbers_efficiency_form($form, &$form_state){
     
     
     $form['efficiency']['numbers_pattern']['grid']=array(
-	'#markup'=>lotto_keno_autopicks_pillar_diagwin_numbers_pattern_grid_create_spiral("lotto_keno", $last_keno_draw_num-1, $last_keno_draw_num_val-1, 15),
+	'#markup'=>lotto_keno_autopicks_pillar_diagwin_numbers_pattern_grid_create_spiral("lotto_keno", $numbers_spiral),
 	
     );
     
-    $form['efficiency']['numbers_pattern']['score_grid']=array(
-	'#markup'=>'',
-	
+    $form['efficiency']['numbers_score']=array(
+	'#type'=>  'fieldset',
+	'#title'=>t("Numbers Score:"),
+	'#collapsible'=>true,
+	'#collapsed'=>false,	
+	'#prefix'=>'<div id="ajx_autopicks_efficiency_numbers_pattern_wrapper" >',
+	'#suffix'=>'</div>'
+    );
+    
+    
+    $form['efficiency']['numbers_score']['grid']=array(
+	'#markup'=>lotto_keno_autopicks_pillar_diagwin_numbers_score_grid_create_spiral("lotto_keno", $numbers_spiral)	
     );
     return $form;
 }
@@ -130,13 +141,17 @@ function ajx_numbers_draw_number_prev($form, $form_state){
     $draw_num_prev_val = $draw_num_val - 1;
     $top_of = $form_state['values']['top_of'];
     
-    $numbers_grid = lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral("lotto_keno", $draw_num_prev, $draw_num_prev_val, $top_of);
-    $numbers_pattern_grid = lotto_keno_autopicks_pillar_diagwin_numbers_pattern_grid_create_spiral("lotto_keno", $draw_num_prev, $draw_num_prev_val, $top_of);
+    $numbers_spiral = get_autopicks_efficiency_report_numbers_spiral("lotto_keno", $draw_num_prev, $draw_num_prev_val, $top_of);
+    $numbers_grid = lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral("lotto_keno", $numbers_spiral);
+    $numbers_pattern_grid = lotto_keno_autopicks_pillar_diagwin_numbers_pattern_grid_create_spiral("lotto_keno", $numbers_spiral);
+    $numbers_score_grid = lotto_keno_autopicks_pillar_diagwin_numbers_score_grid_create_spiral("lotto_keno", $numbers_spiral);
     
     $form['efficiency']['draw_number']['#value'] = $draw_num_prev;
     $form['efficiency']['draw_number_val']['#value'] = $draw_num_prev_val;
     $form['efficiency']['numbers']['grid']['#markup'] = $numbers_grid;
     $form['efficiency']['numbers_pattern']['grid']['#markup'] = $numbers_pattern_grid;
+    $form['efficiency']['numbers_score']['grid']['#markup'] = $numbers_score_grid;
+    
 	
     return $form['efficiency'];
 }
@@ -148,14 +163,16 @@ function ajx_numbers_draw_number_next($form, $form_state){
     $draw_num_next_val = $draw_num_val + 1;
     $top_of = $form_state['values']['top_of'];
     
-    $numbers_grid = lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral("lotto_keno", $draw_num_next, $draw_num_next_val);
-    $numbers_pattern_grid = lotto_keno_autopicks_pillar_diagwin_numbers_pattern_grid_create_spiral("lotto_keno", $draw_num_next, $draw_num_next_val, $top_of);
+    $numbers_spiral = get_autopicks_efficiency_report_numbers_spiral("lotto_keno", $draw_num_next, $draw_num_next_val, $top_of);
+    $numbers_grid = lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral("lotto_keno", $numbers_spiral);
+    $numbers_pattern_grid = lotto_keno_autopicks_pillar_diagwin_numbers_pattern_grid_create_spiral("lotto_keno", $numbers_spiral);
+    $numbers_score_grid = lotto_keno_autopicks_pillar_diagwin_numbers_score_grid_create_spiral("lotto_keno", $numbers_spiral);
     
     $form['efficiency']['draw_number']['#value'] = $draw_num_next;
     $form['efficiency']['draw_number_val']['#value'] = $draw_num_next_val;
     $form['efficiency']['numbers']['grid']['#markup'] = $numbers_grid;
     $form['efficiency']['numbers_pattern']['grid']['#markup']= $numbers_pattern_grid;
- 
+    $form['efficiency']['numbers_score']['grid']['#markup'] = $numbers_score_grid; 
     
     return $form['efficiency'];
 }
@@ -388,6 +405,7 @@ function lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral($lottery
 		break;
 	    case 'lotto_keno':
 		$report_data_spiral =   $autopicks_apd_numbers_spiral;
+		$top_of = 10;
 		
 		
 		$header = "<table><tbody>";
@@ -431,11 +449,11 @@ function lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral($lottery
 		    $index = $i-1;
 
 		    $report .="<td";
-		    $report .=(in_array($report_data['autopick_nbrs']['diagonal'][$index], $report_data_spiral['lotto_results'])) ? " class=\"green\" >" : ">";
-		    $report .= $report_data['autopick_nbrs']['diagonal'][$index]."</td>";
+		    $report .=(in_array($report_data_spiral['autopick_nbrs']['diagonal'][$index], $report_data_spiral['lotto_results'])) ? " class=\"green\" >" : ">";
+		    $report .= $report_data_spiral['autopick_nbrs']['diagonal'][$index]."</td>";
 		    $report .="<td";
-		    $report .=(in_array($report_data['autopick_nbrs']['ladder'][$index], $report_data_spiral['lotto_results'])) ? " class=\"green\" >" : ">";
-		    $report .= $report_data['autopick_nbrs']['ladder'][$index]."</td>";
+		    $report .=(in_array($report_data_spiral['autopick_nbrs']['ladder'][$index], $report_data_spiral['lotto_results'])) ? " class=\"green\" >" : ">";
+		    $report .= $report_data_spiral['autopick_nbrs']['ladder'][$index]."</td>";
 		    $report .="<th class='black' ></th>";
 
 		    $report .="<td";
@@ -543,6 +561,13 @@ function lotto_keno_autopicks_pillar_diagwin_numbers_score_grid_create_spiral($l
 	    break;
 	case 'lotto_keno':
 	    $x=1; $y=80; $scores=array();
+	    for($x=1; $x <= $y; $x++){
+		$scores[$x]['diagonal'] = 0;
+		$scores[$x]['ladder'] = 0;
+		$scores[$x]['pillar'] = 0;
+		$scores[$x]['stepup'] = 0;
+		$scores[$x]['stepdown'] = 0;
+	    }
 		$report_data_spiral = $autopicks_apd_numbers_spiral;
 		
 		$lotto_results = $report_data_spiral['lotto_results'];
@@ -564,37 +589,84 @@ function lotto_keno_autopicks_pillar_diagwin_numbers_score_grid_create_spiral($l
 		
 		/*********************************************************/
 		foreach($autopicks['diagonal'] as $rank=>$num){
-		    $scores[$num] += $score_autopick;
+		    $scores[$num]['diagonal'] += $score_autopick;
 		}
 		foreach($autopicks['ladder'] as $rank=>$num){
-		    $scores[$num] += $score_autopick;
+		    $scores[$num]['ladder'] += $score_autopick;
 		}
 		foreach($diagwin5 as $cat=>$data){
-		    foreach($data as $rank=>$num){
-		    $scores[$num] += $score_5;
+		   foreach($data as $rank=>$num){
+		        $scores[$num][$cat] += $score_5;
 		    }		    
+		    		    
 		}
 		foreach($diagwin10 as $cat=>$data){
 		    foreach($data as $rank=>$num){
-		    $scores[$num] += $score_10;
+			$scores[$num][$cat] += $score_20;
 		    }		    
 		}
 		foreach($diagwin20 as $cat=>$data){
 		    foreach($data as $rank=>$num){
-		    $scores[$num] += $score_20;
+			$scores[$num][$cat] += $score_20;
 		    }		    
 		}
 		foreach($diagwin50 as $cat=>$data){
 		    foreach($data as $rank=>$num){
-		    $scores[$num] += $score_50;
+			$scores[$num][$cat] += $score_50;
 		    }		    
 		}
 		foreach($diagwin100 as $cat=>$data){
 		    foreach($data as $rank=>$num){
-		    $scores[$num] += $score_100;
+			$scores[$num][$cat] += $score_100;
 		    }		    
 		}
-		arsort($scores);
+		    $autopicks = array();
+		    $overall = array();
+		    $stepup = array();
+		    $pillar = array();
+		    $stepdown =  array();
+		
+		   foreach($scores as $num=>$data){
+		       $autopicks[$num]= $data['diagonal'] + $data['ladder'];
+		       $pillar[$num] = $data['pillar'];
+			$stepup[$num] = $data['stepup'];
+			$stepdown[$num] = $data['stepdown'];
+			$overall[$num] = $autopicks[$num] + $pillar[$num] + $stepup[$num] + $stepdown[$num];
+		    }
+		
+		arsort($autopicks);
+		arsort($pillar);
+		arsort($stepup);
+		arsort($stepdown);
+		arsort($overall);
+		
+		$scores = array();
+		$rank=1;
+		foreach($autopicks as $num=>$score){
+		    $scores[$rank]['autopicks'] = array( 'num'=>$num, 'score'=>$score );
+		    $rank++;
+		}
+		$rank=1;
+		foreach($pillar as $num=>$score){
+		    $scores[$rank]['pillar'] = array( 'num'=>$num, 'score'=>$score );
+		    $rank++;
+		}
+		$rank=1;
+		foreach($stepup as $num=>$score){
+		    $scores[$rank]['stepup'] = array( 'num'=>$num, 'score'=>$score );
+		    $rank++;
+		}
+		$rank=1;
+		foreach($stepdown as $num=>$score){
+		    $scores[$rank]['stepdown'] = array( 'num'=>$num, 'score'=>$score );
+		    $rank++;
+		}
+		$rank=1;
+		foreach($overall as $num=>$score){
+		    $scores[$rank]['overall'] = array( 'num'=>$num, 'score'=>$score );
+		    $rank++;
+		}
+		
 		/*********************************************************/
 	    
 	    $header = "<table><tbody>";
@@ -607,20 +679,26 @@ function lotto_keno_autopicks_pillar_diagwin_numbers_score_grid_create_spiral($l
 	    $labels .= "</tr>";
 	    
 	    $body = "";
-	    $rank=1;
-	    foreach($scores as $num=>$score){
+	    foreach($scores as $rank=>$data){		
 		$body .="</tr>";
 		$body .= "<th>".$rank."</th>";
 		$body .= "<td";
-		$body .= ">";
-		$body .=$num."(".$score.")";
+		$body .= ( in_array($data['overall']['num'], $lotto_results)) ? " class=\"green\" >" : (($rank <= 10 ) ? " class=\"yellow\" >": ">");
+		$body .=$data['overall']['num']."(".$data['overall']['score'].")";
 		$body .="</td>";
-		$body .="<td></td>";
-		$body .="<td></td>";
-		$body .="<td></td>";
-		$body .="</tr>";
-		
-		$rank++;
+		$body .= "<td";
+		$body .= ( in_array($data['pillar']['num'], $lotto_results)) ? " class=\"green\" >" : (($rank <= 10 ) ? " class=\"yellow\" >": ">");
+		$body .=$data['pillar']['num']."(".$data['pillar']['score'].")";
+		$body .="</td>";
+		$body .= "<td";
+		$body .= ( in_array($data['stepup']['num'], $lotto_results)) ? " class=\"green\" >" : (($rank <= 10 ) ? " class=\"yellow\" >": ">");
+		$body .=$data['stepup']['num']."(".$data['stepup']['score'].")";
+		$body .="</td>";
+		$body .= "<td";
+		$body .= ( in_array($data['stepdown']['num'], $lotto_results)) ? " class=\"green\" >" : (($rank <= 10 ) ? " class=\"yellow\" >": ">");
+		$body .=$data['stepdown']['num']."(".$data['stepdown']['score'].")";
+		$body .="</td>";
+		$body .="</tr>";		
 	    }
 	    
 	    
