@@ -64,6 +64,16 @@ function lotto_keno_menu(){
         'access arguments' => array('Access Lotto Max Charts'),
         );
 	
+	$items['admin/lotto/lottokeno/bets/autopicks/numbersefficiency_t'] = array(
+        'title' => 'Numbers Efficiency_t',
+        'description' => 'Review Autopicks Efficiency',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('get_lotto_keno_autopicks_numbers_efficiency_form_t'),
+	//'page callback' => 'get_lotto_keno_autopicks_efficiency_form',
+        //'page arguments' => array('draw_num'),
+        'access arguments' => array('Access Lotto Max Charts'),
+        );
+	
 	$items['admin/lotto/lottokeno/bets/autopicks/efficiency_t'] = array(
         'title' => 'Efficiency_t',
         'description' => 'Review Autopicks Efficiency',

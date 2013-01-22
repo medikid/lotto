@@ -49,7 +49,22 @@ function lotto_bets_autopick_config($lottery_name){
     return $autopick_config;
 }
 
-function lotto_bets_autopick($lottery_name, $lottery_draw_num){
+function lotto_bets_autopick($lottery_name, $lottery_draw_num, $num_draws=5){   
+    $autopicks = '';
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':	    	    
+	    $lottery_patterns_feed = lotto_patterns_create($lottery_name, $lottery_draw_num, $num_draws);	    
+	    $autopicks = lotto_bets_autopick_numbers_get($lottery_name, $lottery_patterns_feed);
+	   
+	    break;
+    }    
+    
+    return $autopicks;
+}
+
+function lotto_bets_autopick_numbers_get($lottery_name, $lottery_patterns_feed){
     $autopicks_config= lotto_bets_autopick_config($lottery_name);
     $autopicks = array('diagonal'=>array(), 'pillar'=>array(), 'ladder'=>array(),'sequence'=>array(),'previous_trend'=>array() );
     switch($lottery_name){
@@ -57,7 +72,7 @@ function lotto_bets_autopick($lottery_name, $lottery_draw_num){
 	    break;
 	case 'lotto_keno':
 	    $x=1; $y=80; $num_draws = 5;	    
-	    $patterns = lotto_patterns_create($lottery_name, $lottery_draw_num, $num_draws);
+	    $patterns = $lottery_patterns_feed;
 	    
 	    while ($x <= $y){
 		
@@ -109,7 +124,9 @@ function lotto_bets_autopick($lottery_name, $lottery_draw_num){
     $autopicks['sequence'] = array_unique($autopicks['sequence']);
     $autopicks['previous_trend'] = array_unique($autopicks['previous_trend']);
     
-    return $autopicks;
+    return $autopicks;  
+    
 }
+
 
 ?>
