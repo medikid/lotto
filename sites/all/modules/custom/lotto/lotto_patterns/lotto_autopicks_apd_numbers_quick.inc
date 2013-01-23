@@ -19,6 +19,9 @@ function get_lotto_autopicks_apd_numbers_quick($lottery_name, $draw_num, $draw_n
 		$apd_numbers['lotto_results'][$val_results['n'.$i]] = 1;
 	    }	    
 	    
+	    //set lotto_date_time based on result
+	    $apd_numbers['draw_details']['draw_date_time'] = ($val_results['draw_date']) - (($draw_num_val - $draw_num) * (4*60));
+	    
 	    //get 100 results
 	    $z=100; $draw_num_first=$draw_num; $draw_num_last=$draw_num - $z;	    
 	    $query_results = db_select('lotto_keno', 'lk')->fields('lk');
@@ -115,11 +118,11 @@ function get_lotto_autopicks_apd_numbers_quick($lottery_name, $draw_num, $draw_n
 		arsort($ratios_pillar);
 		arsort($ratios_stepup); 
 		arsort($ratios_stepdown); 
-		/*
+		
 		$apd_numbers['diagwin'.$seq]['pillar'] = $ratios_pillar;
 		$apd_numbers['diagwin'.$seq]['stepup'] = $ratios_stepup;
 		$apd_numbers['diagwin'.$seq]['stepdown'] = $ratios_stepdown;
-		*/
+		/*
 		$x=1;
 		foreach( $ratios_pillar as $num_p=>$ratio_p){		    
 		    $apd_numbers['diagwin'.$seq]['pillar'][$x] = $num_p;
@@ -137,7 +140,7 @@ function get_lotto_autopicks_apd_numbers_quick($lottery_name, $draw_num, $draw_n
 		    $apd_numbers['diagwin'.$seq]['stepdown'][$x] = $num_sd;
 		    $x++;
 		}		  
-		
+		*/
 	    }	
 	}
 	   
