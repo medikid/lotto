@@ -211,7 +211,7 @@ function lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral_t($lotte
 	case 'lotto_max':
 	    break;
 	case 'lotto_keno':
-	    $column_max = 22;
+	    $column_max = 27;
 	    $row_max = 80;
 	    
 	    $draw_details = $apd_numbers['draw_details'];
@@ -223,6 +223,7 @@ function lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral_t($lotte
 	    $diagwin20 = $apd_numbers['diagwin20'];
 	    $diagwin50 = $apd_numbers['diagwin50'];
 	    $diagwin100 = $apd_numbers['diagwin100'];
+	    $ratios_sum = get_lotto_autopicks_apd_numbers_ratio_sum($lottery_name, $apd_numbers);
 	    
 	    $header = "<table class=	\"number_grid\" ><tbody>";
 	    
@@ -238,6 +239,8 @@ function lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral_t($lotte
 	    $label1 .= "<th colspan=\"3\" >Diagwin50</th>";
 	    $label1 .= "<th></th>";
 	    $label1 .= "<th colspan=\"3\" >Diagwin100</th>";
+	    $label1 .= "<th></th>";
+	    $label1 .= "<th colspan=\"4\" >RatioSum</th>";
 	    $label1 .= "</tr>";
 	    
 	    $label2 = "<tr><th></th>";
@@ -260,6 +263,11 @@ function lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral_t($lotte
 	    $label2 .= "<th>Stepup</th>";
 	    $label2 .= "<th>Stepdown</th>";
 	    $label2 .= "<th></th>";
+	    $label2 .= "<th>Pillar</th>";
+	    $label2 .= "<th>Stepup</th>";
+	    $label2 .= "<th>Stepdown</th>";
+	    $label2 .= "<th></th>";
+	    $label2 .= "<th>Overall</th>";
 	    $label2 .= "<th>Pillar</th>";
 	    $label2 .= "<th>Stepup</th>";
 	    $label2 .= "<th>Stepdown</th>";
@@ -384,6 +392,30 @@ function lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral_t($lotte
 			    $body_data[$x][$y] .= $num_5sd."(".$rat_5sd.")</td>";
 			    $x++;
 			}			
+		    } elseif ($y == 24){
+			foreach( $ratios_sum['overall'] as $num_sumo=>$rat_sumo){
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_sumo]];
+			    $body_data[$x][$y] .= $num_sumo."(".$rat_sumo.")</td>";
+			    $x++;
+			}
+		    } elseif ($y == 25){
+			foreach( $ratios_sum['pillar'] as $num_sump=>$rat_sump){
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_sump]];
+			    $body_data[$x][$y] .= $num_sump."(".$rat_sump.")</td>";
+			    $x++;
+			}
+		    } elseif ($y == 26){
+			foreach( $ratios_sum['stepup'] as $num_sumsu=>$rat_sumsu){
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_sumsu]];
+			    $body_data[$x][$y] .= $num_sumsu."(".$rat_sumsu.")</td>";
+			    $x++;
+			}
+		    } elseif ($y == 27){
+			foreach( $ratios_sum['stepdown'] as $num_sumsd=>$rat_sumsd){
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_sumsd]];
+			    $body_data[$x][$y] .= $num_sumsd."(".$rat_sumsd.")</td>";
+			    $x++;
+			}
 		    } else {
 			    for($x=0; $x<$z; $x++){
 			    $body_data[$x][$y] = "<th></th>";
@@ -451,6 +483,8 @@ function lotto_keno_autopicks_numbers_performance_grid_create_t($lottery_name, $
 	    $label1 .= "<th colspan=\"6\" >Diagwin50</th>";
 	    $label1 .= "<th></th>";
 	    $label1 .= "<th colspan=\"6\" >Diagwin100</th>";
+	    //$label1 .= "<th></th>";
+	    //$label1 .= "<th colspan=\"6\" >RatioSum</th>";
 	    $label1 .= "</tr>";
 	    
 	    $label2 = "<tr><th></th>";
@@ -657,5 +691,73 @@ function lotto_keno_autopicks_numbers_performance_grid_create_t($lottery_name, $
 	    break;
     }
     return $number_performance_grid;
+}
+
+function get_lotto_autopicks_apd_numbers_ratio_sum($lottery_name, $apd_numbers){
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	    $lotto_results = $apd_numbers['lotto_results'];
+	    $autopicks_diagonal = $apd_numbers['autopick_nbrs']['diagonal'];
+	    $autopicks_ladder = $apd_numbers['autopick_nbrs']['ladder'];
+	    $diagwin5 = $apd_numbers['diagwin5'];
+	    $diagwin10 = $apd_numbers['diagwin10'];
+	    $diagwin20 = $apd_numbers['diagwin20'];
+	    $diagwin50 = $apd_numbers['diagwin50'];
+	    $diagwin100 = $apd_numbers['diagwin100'];
+	    
+	    $z=80; $ratios_pillar = array();
+	    for($x=1; $x <= $z; $x++){
+		$ratios_pillar[$x] = 0.0;
+		$ratios_pillar[$x] += $diagwin5['pillar'][$x];
+		$ratios_pillar[$x] += $diagwin10['pillar'][$x];
+		$ratios_pillar[$x] += $diagwin20['pillar'][$x];
+		$ratios_pillar[$x] += $diagwin50['pillar'][$x];
+		$ratios_pillar[$x] += $diagwin100['pillar'][$x];
+	    }
+	    
+	    $ratios_stepup = array();
+	    for($x=1; $x <= $z; $x++){
+		$ratios_stepup[$x] = 0.0;
+		$ratios_stepup[$x] += $diagwin5['stepup'][$x];
+		$ratios_stepup[$x] += $diagwin10['stepup'][$x];
+		$ratios_stepup[$x] += $diagwin20['stepup'][$x];
+		$ratios_stepup[$x] += $diagwin50['stepup'][$x];
+		$ratios_stepup[$x] += $diagwin100['stepup'][$x];
+	    }
+	    
+	    $ratios_stepdown = array();
+	    for($x=1; $x <= $z; $x++){
+		$ratios_stepdown[$x] = 0.0;
+		$ratios_stepdown[$x] += $diagwin5['stepdown'][$x];
+		$ratios_stepdown[$x] += $diagwin10['stepdown'][$x];
+		$ratios_stepdown[$x] += $diagwin20['stepdown'][$x];
+		$ratios_stepdown[$x] += $diagwin50['stepdown'][$x];
+		$ratios_stepdown[$x] += $diagwin100['stepdown'][$x];
+	    }
+	    
+	    $ratios_overall = array();
+	    for($x=1; $x <= $z; $x++){
+		$ratios_overall[$x] = 0.0;
+		$ratios_overall[$x] += $ratios_pillar[$x];
+		$ratios_overall[$x] += $ratios_stepdown[$x];
+		$ratios_overall[$x] += $ratios_stepdown[$x];
+	    }
+	    
+	    arsort($ratios_overall);
+	    arsort($ratios_pillar);
+	    arsort($ratios_stepup);
+	    arsort($ratios_stepdown);
+	    
+	    $ratios_sum=array();
+	    $ratios_sum['overall'] = $ratios_overall;
+	    $ratios_sum['pillar'] = $ratios_pillar;
+	    $ratios_sum['stepup'] = $ratios_stepup;
+	    $ratios_sum['stepdown'] = $ratios_stepdown;
+	    
+	    break;
+    }
+    return $ratios_sum;
 }
 ?>
