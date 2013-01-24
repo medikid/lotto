@@ -1,0 +1,6 @@
+name = LottoBets
+description = Lotto Bets module
+package = Lotto
+core = 7.x
+files[] = lotto_bets.module
+files[] = lotto_bets.install

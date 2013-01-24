@@ -97,6 +97,16 @@ function lotto_keno_menu(){
         'page arguments' => array('get_lotto_keno_bets_diag_wins_form'),
         'access arguments' => array('Access Lotto Max Charts'),
         );
+	
+	$items['admin/lotto/lottokeno/bets/prizetable'] = array(
+        'title' => 'Prize Table',
+        'description' => 'Review Bets Vs PrizeTable',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('get_lotto_keno_prize_table_form'),
+        'access arguments' => array('Access Lotto Max Charts'),
+        );
+	
+	
 	/********************************RESULTS*************************************************/
 	$items['admin/lotto/lottokeno/results'] = array(
         'title' => 'Results',

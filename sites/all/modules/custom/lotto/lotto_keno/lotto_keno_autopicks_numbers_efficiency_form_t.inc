@@ -131,18 +131,29 @@ function get_lotto_keno_autopicks_numbers_efficiency_form_t($form, &$form_state)
 	
     );
     
-    $form['efficiency']['numbers_score']=array(
+    $form['efficiency']['betting_system']=array(
 	'#type'=>  'fieldset',
-	'#title'=>t("Numbers Score:"),
+	'#title'=>t("Betting System:"),
 	'#collapsible'=>true,
 	'#collapsed'=>false,	
-	'#prefix'=>'<div id="ajx_autopicks_efficiency_numbers_pattern_wrapper" >',
+	'#prefix'=>'<div id="ajx_autopicks_efficiency_betting_system_wrapper" >',
 	'#suffix'=>'</div>'
     );
     
+    $form['efficiency']['betting_system']['profile']=array(
+	'#type'=>  'select',
+	'#title'=>t("Betting Profile: "),
+	'#default_value'=> 1,
+	'#options'=>array(
+	    0=>t("Select Profile"),
+	    1=>t("Exclude Current Results"),
+	    2=>t("Exclude Current-Last Results")
+	),
+	'#size'=> 11	
+    );
     
-    $form['efficiency']['numbers_score']['grid']=array(
-	'#markup'=>''//lotto_keno_autopicks_pillar_diagwin_numbers_score_grid_create_spiral("lotto_keno", $numbers_spiral)	
+    $form['efficiency']['betting_system']['grid']=array(
+	'#markup'=>lotto_keno_betting_system_performance_grid_create("lotto_keno", $numbers_spiral)	
     );
     return $form;
 }
@@ -467,7 +478,7 @@ function lotto_keno_autopicks_numbers_performance_grid_create_t($lottery_name, $
 	    $diagwin20 = $apd_numbers['diagwin20'];
 	    $diagwin50 = $apd_numbers['diagwin50'];
 	    $diagwin100 = $apd_numbers['diagwin100'];    
-	      
+	    $ratios_sum = get_lotto_autopicks_apd_numbers_ratio_sum($lottery_name, $apd_numbers);
 	    
 	    $header = "<table class=\"number_performance_grid\" ><tbody>";
 	    
@@ -483,8 +494,8 @@ function lotto_keno_autopicks_numbers_performance_grid_create_t($lottery_name, $
 	    $label1 .= "<th colspan=\"6\" >Diagwin50</th>";
 	    $label1 .= "<th></th>";
 	    $label1 .= "<th colspan=\"6\" >Diagwin100</th>";
-	    //$label1 .= "<th></th>";
-	    //$label1 .= "<th colspan=\"6\" >RatioSum</th>";
+	    $label1 .= "<th></th>";
+	    $label1 .= "<th colspan=\"8\" >RatioSum</th>";
 	    $label1 .= "</tr>";
 	    
 	    $label2 = "<tr><th></th>";
@@ -507,6 +518,11 @@ function lotto_keno_autopicks_numbers_performance_grid_create_t($lottery_name, $
 	    $label2 .= "<th colspan=\"2\" >Stepup</th>";
 	    $label2 .= "<th colspan=\"2\" >Stepdown</th>";
 	    $label2 .= "<th></th>";
+	    $label2 .= "<th colspan=\"2\" >Pillar</th>";
+	    $label2 .= "<th colspan=\"2\" >Stepup</th>";
+	    $label2 .= "<th colspan=\"2\" >Stepdown</th>";
+	    $label2 .= "<th></th>";
+	    $label2 .= "<th colspan=\"2\" >Overall</th>";
 	    $label2 .= "<th colspan=\"2\" >Pillar</th>";
 	    $label2 .= "<th colspan=\"2\" >Stepup</th>";
 	    $label2 .= "<th colspan=\"2\" >Stepdown</th>";
@@ -621,7 +637,19 @@ function lotto_keno_autopicks_numbers_performance_grid_create_t($lottery_name, $
 		    }
 		}
 	    }
-	    
+	    $rslt=array();
+	    foreach( $ratios_sum as $cat_rsum=>$data_rsum ){
+		$x=0;
+		foreach($data_rsum as $num_rsum=>$rat_rsum){
+		    array_push($rslt, $lotto_results[$num_rsum]);
+		    $x++;
+		    if(($x % $range_limit) == 0){
+			$div = (int)($x / $range_limit);
+			$nbr_performance['ratio_sum'][$cat_rsum][$div] = $rslt;
+			$rslt = array();
+		    }
+		}
+	    }
 	    
 	    
 	    
@@ -675,6 +703,15 @@ function lotto_keno_autopicks_numbers_performance_grid_create_t($lottery_name, $
 		$body .= "<td>".  array_sum($nbr_performance['diagwin100']['stepdown'][$x])."</td>";
 		$body .= ($y == 0) ? "<td rowspan=\"2\" >".(array_sum($nbr_performance['diagwin100']['stepdown'][$x]) + array_sum($nbr_performance['diagwin100']['stepdown'][($x + 1)]))."</td>":"";  
 		$body .= "<th></th>";
+		
+		$body .= "<td>".  array_sum($nbr_performance['ratio_sum']['overall'][$x])."</td>";
+		$body .= ($y == 0) ? "<td rowspan=\"2\" >".(array_sum($nbr_performance['ratio_sum']['overall'][$x]) + array_sum($nbr_performance['ratio_sum']['overall'][($x + 1)]))."</td>":"";  
+		$body .= "<td>".  array_sum($nbr_performance['ratio_sum']['pillar'][$x])."</td>";
+		$body .= ($y == 0) ? "<td rowspan=\"2\" >".(array_sum($nbr_performance['ratio_sum']['pillar'][$x]) + array_sum($nbr_performance['ratio_sum']['pillar'][($x + 1)]))."</td>":"";  
+		$body .= "<td>".  array_sum($nbr_performance['ratio_sum']['stepup'][$x])."</td>";
+		$body .= ($y == 0) ? "<td rowspan=\"2\" >".(array_sum($nbr_performance['ratio_sum']['stepup'][$x]) + array_sum($nbr_performance['ratio_sum']['stepup'][($x + 1)]))."</td>":"";  
+		$body .= "<td>".  array_sum($nbr_performance['ratio_sum']['stepdown'][$x])."</td>";
+		$body .= ($y == 0) ? "<td rowspan=\"2\" >".(array_sum($nbr_performance['ratio_sum']['stepdown'][$x]) + array_sum($nbr_performance['ratio_sum']['stepdown'][($x + 1)]))."</td>":"";  
 		
 		$body .= "</tr>";
 		
@@ -759,5 +796,76 @@ function get_lotto_autopicks_apd_numbers_ratio_sum($lottery_name, $apd_numbers){
 	    break;
     }
     return $ratios_sum;
+}
+
+function lotto_keno_betting_system_performance_grid_create($lottery_name, $apd_numbers, $betting_profile=1){
+    
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	    $draw_num = $apd_numbers['draw_details']['draw_num'];
+	    $lotto_results = $apd_numbers['lotto_results'];
+	    $diagwin5 = $apd_numbers['diagwin5'];
+	    $diagwin10 = $apd_numbers['diagwin10'];
+	    $diagwin20 = $apd_numbers['diagwin20'];
+	    $diagwin50 = $apd_numbers['diagwin50'];
+	    $diagwin100 = $apd_numbers['diagwin100'];
+	    
+	    switch($betting_profile){
+		case 1:
+		    $unlucky_numbers = profile_exclude_currently_won_numbers($lottery_name, $draw_num);
+		    break;		    
+		case 2:
+		    $unlucky_numbers = profile_exclude_current_n_last_won_numbers($lottery_name, $draw_num);
+		    break;
+	    }
+	   
+	
+	$betting_numbers = array();
+	foreach($diagwin5 as $cat_5=>$data_5){
+	    $betting_numbers['diagwin5'][$cat_5] = array();
+		foreach($data_5 as $num_5=>$rat_5){
+		    if( !in_array($num_5, $unlucky_numbers))
+		    array_push($betting_numbers['diagwin5'][$cat_5], $num_5);
+		}
+	}
+	
+	foreach($diagwin10 as $cat_10=>$data_10){
+	    $betting_numbers['diagwin10'][$cat_10] = array();
+		foreach($data_10 as $num_10=>$rat_10){
+		    if( !in_array($num_10, $unlucky_numbers))
+		    array_push($betting_numbers['diagwin10'][$cat_10], $num_10);
+		}
+	}
+	
+	foreach($diagwin20 as $cat_20=>$data_20){
+	    $betting_numbers['diagwin20'][$cat_20] = array();
+		foreach($data_20 as $num_20=>$rat_20){
+		    if( !in_array($num_20, $unlucky_numbers))
+		    array_push($betting_numbers['diagwin20'][$cat_20], $num_20);
+		}
+	}
+	
+	foreach($diagwin50 as $cat_50=>$data_50){
+	    $betting_numbers['diagwin50'][$cat_50] = array();
+		foreach($data_50 as $num_50=>$rat_50){
+		    if( !in_array($num_50, $unlucky_numbers))
+		    array_push($betting_numbers['diagwin50'][$cat_50], $num_50);
+		}
+	}
+	
+	foreach($diagwin100 as $cat_100=>$data_100){
+	    $betting_numbers['diagwin100'][$cat_100] = array();
+		foreach($data_100 as $num_100=>$rat_100){
+		    if( !in_array($num_100, $unlucky_numbers))
+		    array_push($betting_numbers['diagwin100'][$cat_100], $num_100);
+		}
+	}
+	
+	 break;	 
+    }
+    
+    return $betting_numbers;
 }
 ?>

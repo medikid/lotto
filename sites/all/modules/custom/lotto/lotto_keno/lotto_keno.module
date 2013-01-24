@@ -14,6 +14,7 @@ module_load_include('inc', 'lotto_keno', 'lotto_keno_autopicks_efficiency_report
 module_load_include('inc', 'lotto_keno', 'lotto_keno_autopicks_efficiency_form_t');
 module_load_include('inc', 'lotto_keno', 'lotto_keno_autopicks_numbers_efficiency_form');
 module_load_include('inc', 'lotto_keno', 'lotto_keno_autopicks_numbers_efficiency_form_t');
+module_load_include('inc', 'lotto_keno', 'lotto_keno_prize_table_form');
 
 function lotto_keno_result_exists($keno_draw_number){
     $exists = false;

@@ -1,0 +1,75 @@
+<?php
+
+module_load_include('inc', 'lotto_bets', 'lotto_betting_system');
+
+function get_lotto_keno_prize_table_grid($lottery_name){
+  $prize_table_grid='';
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+
+	    $query = db_select('lotto_prize_table', 'lpt')
+		->fields('lpt')
+		->condition('lottery_name', 'lotto_keno')
+		->orderBy('picks', 'ASC')
+		->orderBy('matches', 'DESC')
+		->execute();
+	    
+	    $picks ="";$prize_array=array();
+	    while( $prize_table = $query->fetchAssoc()){
+		if ( $picks == $prize_table['picks']){
+		      array_push($prize_array[$picks], array( 'matches'=>$prize_table['matches'], 'win'=>$prize_table['win'] ));
+		} else {
+		    $picks = $prize_table['picks'];
+		    $prize_array[$picks] = array( array('matches'=>$prize_table['matches'] , 'win'=>$prize_table['win']) );		   
+		}
+	    }
+
+	    $header = "<table class=\"prize_table_grid\" style=\"width:30px\" ><tbody>";
+	    $label  = "<tr>";
+	    $label .= "<th>Picks</th>";
+	    $label .= "<th>Matches</th>";
+	    $label .= "<th>Prize</th>";
+	    $label .= "</tr>";
+
+	    $body=""; $x=0;
+	    foreach($prize_array as $picks=>$data){
+		if($x == 0){
+		    $style="style=\"background-color:grey\" ";
+		    $x=1;
+		} else {
+		    $style="style=\"background-color:lightgrey\" ";
+		    $x=0;
+		}
+		foreach($data as $ind=>$match_win){
+		    $body .= "<tr>";
+		    $body .= ($ind == 0) ? "<td rowspan=\"". count($data). "\"".$style.">".$picks."</td>" : "";
+		    $body .= "<td ".$style." >".$match_win['matches']."</td>";
+		    $body .= "<td ".$style." >"."$".$match_win['win']."</td>";
+		    $body .= "</tr>";
+		}		
+	    }	    
+	    
+	    $footer = "</tbody></table>";
+	    
+	    $prize_table_grid = $header .$label .$body .$footer;
+	    break;
+  }
+    return $prize_table_grid;
+}
+
+function validate_ticket($lottery_name, $picks, $matches){
+    $win = 0;
+    $prize = db_select('lotto_prize_table', 'lpt')
+		->fields('lpt')
+		->condition('lottery_name', $lottery_name)
+		->condition('picks', $picks)
+		->condition('matches', $matches)
+		->execute()
+		->fetchAssoc();
+    if ($prize){
+	$win = $prize['win'];
+    }
+    return $win;
+}

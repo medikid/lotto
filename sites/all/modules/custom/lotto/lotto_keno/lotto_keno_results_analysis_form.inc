@@ -2,6 +2,13 @@
 
 function get_lotto_keno_results_analysis_form($form, &$form_state){
     drupal_add_css(drupal_get_path('module', 'lotto_core') . '/css/number_grid.css', array('group' => CSS_DEFAULT, 'type' => 'file'));
+    
+    if (isset($draw_num)){
+	$last_keno_draw_num = $draw_num;
+    } else $last_keno_draw_num = get_last_keno_drawnumber("lotto_keno") - 1;
+    $stat_type = 3;
+    $lotto_stats = lotto_stats_by_draw_number("lotto_keno", $last_keno_draw_num, $stat_type);
+    
     $form=array(
 	'#prefix'=>'<div id="grid_form_wrapper">',
 	'#suffix'=>'</div>'
@@ -19,10 +26,10 @@ function get_lotto_keno_results_analysis_form($form, &$form_state){
 	      )
       );
     
-    $form['lotto_stat_id'] = array(
+    $form['lotto_draw_number'] = array(
 	   '#type' => 'textfield',
-	  '#title' => t('Stat ID:'),
-	  '#default_value' => "",
+	  '#title' => t('Draw#:'),
+	  '#default_value' => $last_keno_draw_num,
 	  '#size' => 12,
 	  '#maxlength' => 12,
 	   '#ajax' => array(
@@ -56,18 +63,22 @@ function get_lotto_keno_results_analysis_form($form, &$form_state){
 
     
     $form['grid']['result_grid'] = array(
-	'#markup' => ''
+	'#markup' => lotto_result_grid_analysis('lotto_keno', $lotto_stats['lksid'])
     );
     
     $form['grid']['skipped_grid'] = array(
-	'#markup' => ''
+	'#markup' => lotto_skipped_grid_analysis('lotto_keno',$lotto_stats['lksid'])
     );
     
     return $form;
 }
 
 function ajx_results_analysis_load($form, $form_state){
-    $lotto_stat_id = $form_state['values']['lotto_stat_id'];
+    $lotto_draw_number = $form_state['values']['lotto_draw_number'];
+    $stat_type = 3;
+    $lotto_stats = lotto_stats_by_draw_number("lotto_keno", $lotto_draw_number, $stat_type);
+    $lotto_stat_id = $lotto_stats['lksid'];
+    
     $form['grid']['#collapsed'] = FALSE ;
     $form['grid']['#prefix']='<div id="grid_wrapper" >';
     $form['grid']['#suffix']='</div>';
@@ -79,9 +90,13 @@ function ajx_results_analysis_load($form, $form_state){
 }
 
 function ajx_results_analysis_load_next($form, $form_state){
-    $lotto_stat_id = $form_state['input']['lotto_stat_id'];
-    $lotto_stat_id_next = $lotto_stat_id + 1;
-    $form['lotto_stat_id']['#value'] = $lotto_stat_id_next;
+    $lotto_draw_number = $form_state['input']['lotto_draw_number'];
+    $lotto_draw_number_next = $lotto_draw_number + 1;
+    $form['lotto_draw_number']['#value'] = $lotto_draw_number_next;
+    
+    $stat_type = 3;
+    $lotto_stats = lotto_stats_by_draw_number("lotto_keno", $lotto_draw_number_next, $stat_type);
+    $lotto_stat_id_next = $lotto_stats['lksid'];
     
     $form['grid']['#collapsed'] = FALSE ;
     $form['grid']['#prefix']='<div id="grid_wrapper" >';
@@ -93,9 +108,13 @@ function ajx_results_analysis_load_next($form, $form_state){
     return $form;
 }
 function ajx_results_analysis_load_prev($form, $form_state){
-     $lotto_stat_id = $form_state['input']['lotto_stat_id'];
-    $lotto_stat_id_prev = $lotto_stat_id - 1;
-    $form['lotto_stat_id']['#value'] = $lotto_stat_id_prev;
+    $lotto_draw_number = $form_state['input']['lotto_draw_number'];
+    $lotto_draw_number_prev = $lotto_draw_number - 1;
+    $form['lotto_draw_number']['#value'] = $lotto_draw_number_prev;
+    
+    $stat_type = 3;
+    $lotto_stats = lotto_stats_by_draw_number("lotto_keno", $lotto_draw_number_prev, $stat_type);
+    $lotto_stat_id_prev = $lotto_stats['lksid'];
     
     $form['grid']['#collapsed'] = FALSE ;
     $form['grid']['#prefix']='<div id="grid_wrapper" >';
