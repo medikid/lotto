@@ -73,3 +73,44 @@ function validate_ticket($lottery_name, $picks, $matches){
     }
     return $win;
 }
+
+function get_matches($bets, $results){
+    return( array_intersect($bets, $results));
+}
+
+function get_lotto_apd_numbers_matches($lottery_name, $apd_numbers){
+     $apd_numbers_matches = array();
+     switch($lottery_name){
+	 case 'lotto_max':
+	     break;
+	 case 'lotto_keno':
+	    $results = $apd_numbers['lotto_results'];
+	    $lotto_results = array();
+	    foreach($results as $num=>$res){
+		if ($res == 1){
+		array_push($lotto_results, $num);
+		}
+	    }
+
+	    $diagwin_numbers=array(
+		'diagwin5' => $apd_numbers['diagwin5'],
+		'diagwin10' => $apd_numbers['diagwin10'],
+		'diagwin20' => $apd_numbers['diagwin20'],
+		'diagwin50' => $apd_numbers['diagwin50'],
+		'diagwin100' => $apd_numbers['diagwin100']
+		);
+
+	    foreach($diagwin_numbers as $diagwin_cat=>$nbrs){
+		$apd_numbers_matches[$diagwin_cat]=array(); $diagwin=array();
+		foreach($nbrs as $cat=>$data){
+		    $diagwin[$cat]=array();
+		    foreach($data as $num=>$rat){
+			array_push($diagwin[$cat], $num);
+		    }
+		    $apd_numbers_matches[$diagwin_cat][$cat] = array_intersect($diagwin[$cat], $lotto_results);
+		}
+	    }
+	   break;
+     }
+   return $apd_numbers_matches;    
+}
