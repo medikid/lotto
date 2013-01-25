@@ -70,7 +70,9 @@ table#v {
 td.yellow{    
     background-color: yellow;
 }
-
+td.orange{    
+    background-color: orange;
+}
 td.green {
     background-color: yellowgreen;
 }

@@ -63,4 +63,26 @@ function lotto_bets_group_sets($group_of_numbers, $set_of){
     return $bets;
 }
 
+function get_unlucky_numbers_by_betting_profile($lottery_name, $betting_profile, $draw_num){
+    $unlucky_numbers='';
+    switch($lottery_name){
+	case 'lotto_max':
+	    break;
+	case 'lotto_keno':
+	    switch($betting_profile){
+		case 0:
+		    $unlucky_numbers = array();
+		    break;
+		case 1:
+		    $unlucky_numbers = profile_exclude_currently_won_numbers($lottery_name, $draw_num);
+		    break;
+		case 2:
+		    $unlucky_numbers = profile_exclude_current_n_last_won_numbers($lottery_name, $draw_num);
+		    break;
+	    }
+	    
+	    break;
+    }
+    return $unlucky_numbers;
+}
 ?>

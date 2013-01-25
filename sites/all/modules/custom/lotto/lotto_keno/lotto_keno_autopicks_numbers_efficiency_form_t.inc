@@ -10,7 +10,10 @@ function get_lotto_keno_autopicks_numbers_efficiency_form_t($form, &$form_state)
     } else $last_keno_draw_num = get_last_keno_drawnumber("lotto_keno") - 1;
     $last_keno_draw_num_val = $last_keno_draw_num + 1;
     $top_of = 10;
-    $defaults = array('enable_numbers_grid'=>1, 'enable_performance_grid'=>1, 'enable_betting_system_grid'=>1);
+    $defaults = array(
+	'enable_numbers_grid'=>1,
+	'enable_performance_grid'=>1,
+	'enable_betting_system_grid'=>1,);
     
     $numbers_spiral = get_lotto_autopicks_apd_numbers_quick("lotto_keno", $last_keno_draw_num, $last_keno_draw_num_val);
        
@@ -104,9 +107,51 @@ function get_lotto_keno_autopicks_numbers_efficiency_form_t($form, &$form_state)
     $form['efficiency']['enable_betting_system_grid']=array(
 	'#type'=>  'checkbox',
 	'#title'=>t("Betting System Grid: "),
-	'#default_value'=>$defaults['enable_betting_system_grid']
+	'#default_value'=>$defaults['enable_betting_system_grid'],
+	'#suffix'=>'</div>'
     );
      
+   $form['efficiency']['betting_profile']=array(
+	'#type'=>  'select',
+	'#title'=>t("Betting Profile: "),
+	'#default_value'=> 1,
+	'#options'=>array(
+	    0=>t("Select Profile"),
+	    1=>t("Exclude Current Results(~20)"),
+	    2=>t("Exclude Current-Last Results(~35)")
+	),
+       '#prefix'=>'<div class="container-inline">'
+    );
+    
+    $form['efficiency']['set_of_each']=array(
+	'#type'=>  'select',
+	'#title'=>t("Picks#: "),
+	'#default_value'=> 10,
+	'#options'=>array(
+	    0=>t("Select Profile"),
+	    1=>t("1s"),
+	    2=>t("2s"),
+	    3=>t("3s"),
+	    4=>t("4s"),
+	    5=>t("5s"),
+	    6=>t("6s"),
+	    7=>t("7s"),
+	    8=>t("8s"),
+	    9=>t("9s"),
+	    10=>t("10s")
+	),
+	'#prefix'=>'&nbsp &nbsp'
+    );
+    $form['efficiency']['number_of_bets']=array(
+	'#type'=>  'textfield',
+	'#title'=>t("Bets#: "),
+	'#default_value'=> 8,
+	'#size'=>3,
+	'#prefix'=>'&nbsp &nbsp',
+	'#suffix'=>'</div>'
+    );
+    
+    
     $form['efficiency']['numbers']=array(
 	'#type'=>  'fieldset',
 	'#title'=>t("Numbers Grid:"),
@@ -117,7 +162,7 @@ function get_lotto_keno_autopicks_numbers_efficiency_form_t($form, &$form_state)
     );
     
     $form['efficiency']['numbers']['grid']=array(
-	'#markup'=>lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral_t("lotto_keno", $numbers_spiral)
+	'#markup'=>lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral_t("lotto_keno", $numbers_spiral, 1, 10)
 	
     );
     
@@ -145,44 +190,7 @@ function get_lotto_keno_autopicks_numbers_efficiency_form_t($form, &$form_state)
 	'#suffix'=>'</div>'
     );
     
-    $form['efficiency']['betting_system']['profile']=array(
-	'#type'=>  'select',
-	'#title'=>t("Betting Profile: "),
-	'#default_value'=> 1,
-	'#options'=>array(
-	    0=>t("Select Profile"),
-	    1=>t("Exclude Current Results(~20)"),
-	    2=>t("Exclude Current-Last Results(~35)")
-	),	
-    );
-    
-    $form['efficiency']['betting_system']['each_set_of']=array(
-	'#type'=>  'select',
-	'#title'=>t("Each Set of: "),
-	'#default_value'=> 10,
-	'#options'=>array(
-	    0=>t("Select Profile"),
-	    1=>t("1s"),
-	    2=>t("2s"),
-	    3=>t("3s"),
-	    4=>t("4s"),
-	    5=>t("5s"),
-	    6=>t("6s"),
-	    7=>t("7s"),
-	    8=>t("8s"),
-	    9=>t("9s"),
-	    10=>t("10s")
-	),
-	'#prefix'=>'&nbsp &nbsp'
-    );
-    $form['efficiency']['betting_system']['number_of_bets']=array(
-	'#type'=>  'textfield',
-	'#title'=>t("Bets#: "),
-	'#default_value'=> 8,
-	'#size'=>3,
-	'#prefix'=>'&nbsp &nbsp'
-    );
-    
+ 
     $form['efficiency']['betting_system']['grid']=array(
 	'#markup'=>lotto_keno_betting_system_performance_grid_create("lotto_keno", $numbers_spiral, 2, 7, 0)	
     );
@@ -198,21 +206,29 @@ function ajx_numbers_draw_number_prev_t($form, $form_state){
     $top_of = $form_state['values']['top_of'];
     $enable_numbers_grid = $form_state['values']['enable_numbers_grid'];
     $enable_performance_grid = $form_state['values']['enable_performance_grid'];
+    $enable_betting_system_grid = $form_state['values']['enable_betting_system_grid'];
+    
+    $betting_profile=$form_state['values']['betting_profile'];
+    $set_of_each=$form_state['values']['set_of_each'];
+    $number_of_bets=$form_state['values']['number_of_bets'];
     
     $numbers_spiral = get_lotto_autopicks_apd_numbers_quick("lotto_keno", $draw_num_prev, $draw_num_prev_val );
      if($enable_numbers_grid == 1){
-	$numbers_grid = lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral_t("lotto_keno", $numbers_spiral);
+	$numbers_grid = lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral_t("lotto_keno", $numbers_spiral, $betting_profile, $set_of_each);
      } else $numbers_grid = '';
      if($enable_performance_grid == 1){
 	$numbers_performance_grid = lotto_keno_autopicks_numbers_performance_grid_create_t("lotto_keno", $numbers_spiral);
      } else $numbers_performance_grid = '';
+     if($enable_betting_system_grid == 1){
+	$betting_system_grid = lotto_keno_betting_system_performance_grid_create("lotto_keno", $numbers_spiral, $betting_profile, $set_of_each, $number_of_bets);
+     } else $betting_system_grid = '';
     //$numbers_score_grid = lotto_keno_autopicks_pillar_diagwin_numbers_score_grid_create_spiral("lotto_keno", $numbers_spiral);
     
     $form['efficiency']['draw_number']['#value'] = $draw_num_prev;
     $form['efficiency']['draw_number_val']['#value'] = $draw_num_prev_val;
     $form['efficiency']['numbers']['grid']['#markup'] = $numbers_grid;
     $form['efficiency']['numbers_performance']['grid']['#markup'] = $numbers_performance_grid;
-    //$form['efficiency']['numbers_score']['grid']['#markup'] = $numbers_score_grid;
+    $form['efficiency']['betting_system']['grid']['#markup'] = $betting_system_grid;
     
 	
     return $form['efficiency'];
@@ -226,15 +242,23 @@ function ajx_numbers_draw_number_next_t($form, $form_state){
     $top_of = $form_state['values']['top_of'];
     $enable_numbers_grid = $form_state['values']['enable_numbers_grid'];
     $enable_performance_grid = $form_state['values']['enable_performance_grid'];
+    $enable_betting_system_grid = $form_state['values']['enable_betting_system_grid'];
+    $betting_profile=$form_state['values']['betting_profile'];
+    $set_of_each=$form_state['values']['set_of_each'];
+    $number_of_bets=$form_state['values']['number_of_bets'];
     
     $numbers_spiral = get_lotto_autopicks_apd_numbers_quick("lotto_keno", $draw_num_next, $draw_num_next_val);
     if($enable_numbers_grid == 1){
-	$numbers_grid = lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral_t("lotto_keno", $numbers_spiral);
+	$numbers_grid = lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral_t("lotto_keno", $numbers_spiral, $betting_profile, $set_of_each);
     } else $numbers_grid = '';
     if($enable_performance_grid == 1){
 	$numbers_performance_grid = lotto_keno_autopicks_numbers_performance_grid_create_t("lotto_keno", $numbers_spiral);
     } else $numbers_performance_grid = '';
-    //$numbers_score_grid = lotto_keno_autopicks_pillar_diagwin_numbers_score_grid_create_spiral("lotto_keno", $numbers_spiral);
+    if($enable_betting_system_grid == 1){
+	$betting_system_grid = lotto_keno_betting_system_performance_grid_create("lotto_keno", $numbers_spiral, $betting_profile, $set_of_each, $number_of_bets);
+     } else $betting_system_grid = '';
+    
+//$numbers_score_grid = lotto_keno_autopicks_pillar_diagwin_numbers_score_grid_create_spiral("lotto_keno", $numbers_spiral);
     
     
     $form['efficiency']['enable_numbers_grid']['#value'] = $enable_numbers_grid;
@@ -243,12 +267,12 @@ function ajx_numbers_draw_number_next_t($form, $form_state){
     $form['efficiency']['draw_number_val']['#value'] = $draw_num_next_val;
     $form['efficiency']['numbers']['grid']['#markup'] = $numbers_grid;
     $form['efficiency']['numbers_performance']['grid']['#markup'] = $numbers_performance_grid;
-    //$form['efficiency']['numbers_score']['grid']['#markup'] = $numbers_score_grid; 
+    $form['efficiency']['betting_system']['grid']['#markup'] = $betting_system_grid; 
     
     return $form['efficiency'];
 }
 
-function lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral_t($lottery_name, $apd_numbers){
+function lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral_t($lottery_name, $apd_numbers, $betting_profile=1, $set_of_each=10){
     $number_grid='';
     switch($lottery_name){
 	case 'lotto_max':
@@ -267,6 +291,8 @@ function lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral_t($lotte
 	    $diagwin50 = $apd_numbers['diagwin50'];
 	    $diagwin100 = $apd_numbers['diagwin100'];
 	    $ratios_sum = get_lotto_autopicks_apd_numbers_ratio_sum($lottery_name, $apd_numbers);
+	    
+	    $unlucky_numbers = get_unlucky_numbers_by_betting_profile($lottery_name, $betting_profile, $draw_details['draw_num']);
 	    
 	    $header = "<table class=	\"number_grid\" ><tbody>";
 	    
@@ -320,7 +346,9 @@ function lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral_t($lotte
 	    $predifined_tds=array();
 	    $predifined_tds['result_0']="<td>";
 	    $predifined_tds['result_1']="<td class=\"green\" >";
-	    
+	    $predifined_tds['result_00']="<td>";
+	    $predifined_tds['result_01']="<td class=\"yellow\" >";
+	    $predifined_tds['result_11']="<td class=\"orange\" >";
 	    
 	    $body_data = array();
 	    
@@ -335,127 +363,127 @@ function lotto_keno_autopicks_pillar_diagwin_numbers_grid_create_spiral_t($lotte
 			} 
 		    }elseif ($y == 1){
 			foreach($autopicks_diagonal as $ind_ad=>$num_ad){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_ad]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_ad].in_array($num_ad, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_ad."</td>";
 			    $x++;
 			}
 		    } elseif ($y == 2){
 			foreach( $autopicks_ladder as $ind_al=>$num_al){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_al]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_al].in_array($num_al, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_al."</td>";
 			    $x++;
 			}
 		    } elseif ($y == 4){
 			foreach( $diagwin5['pillar'] as $num_5p=>$rat_5p){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5p]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5p].in_array($num_5p, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_5p."(".$rat_5p.")</td>";
 			    $x++;
 			}			
 		    } elseif ($y == 5){
 			foreach( $diagwin5['stepup'] as $num_5su=>$rat_5su){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5su]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5su].in_array($num_5su, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_5su."(".$rat_5su.")</td>";
 			    $x++;
 			}			
 		    } elseif ($y == 6){
 			foreach( $diagwin5['stepdown'] as $num_5sd=>$rat_5sd){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5sd]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5sd].in_array($num_5sd, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_5sd."(".$rat_5sd.")</td>";
 			    $x++;
 			}			
 		    } elseif ($y == 8){
 			foreach( $diagwin10['pillar'] as $num_5p=>$rat_5p){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5p]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5p].in_array($num_5p, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_5p."(".$rat_5p.")</td>";
 			    $x++;
 			}			
 		    } elseif ($y == 9){
 			foreach( $diagwin10['stepup'] as $num_5su=>$rat_5su){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5su]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5su].in_array($num_5su, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_5su."(".$rat_5su.")</td>";
 			    $x++;
 			}			
 		    } elseif ($y == 10){
 			foreach( $diagwin10['stepdown'] as $num_5sd=>$rat_5sd){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5sd]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5sd].in_array($num_5sd, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_5sd."(".$rat_5sd.")</td>";
 			    $x++;
 			}			
 		    } elseif ($y == 12){
 			foreach( $diagwin20['pillar'] as $num_5p=>$rat_5p){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5p]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5p].in_array($num_5p, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_5p."(".$rat_5p.")</td>";
 			    $x++;
 			}			
 		    } elseif ($y == 13){
 			foreach( $diagwin20['stepup'] as $num_5su=>$rat_5su){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5su]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5su].in_array($num_5su, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_5su."(".$rat_5su.")</td>";
 			    $x++;
 			}			
 		    } elseif ($y == 14){
 			foreach( $diagwin20['stepdown'] as $num_5sd=>$rat_5sd){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5sd]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5sd].in_array($num_5sd, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_5sd."(".$rat_5sd.")</td>";
 			    $x++;
 			}			
 		    } elseif ($y == 16){
 			foreach( $diagwin50['pillar'] as $num_5p=>$rat_5p){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5p]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5p].in_array($num_5p, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_5p."(".$rat_5p.")</td>";
 			    $x++;
 			}			
 		    } elseif ($y == 17){
 			foreach( $diagwin50['stepup'] as $num_5su=>$rat_5su){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5su]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5su].in_array($num_5su, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_5su."(".$rat_5su.")</td>";
 			    $x++;
 			}			
 		    } elseif ($y == 18){
 			foreach( $diagwin50['stepdown'] as $num_5sd=>$rat_5sd){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5sd]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5sd].in_array($num_5sd, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_5sd."(".$rat_5sd.")</td>";
 			    $x++;
 			}			
 		    } elseif ($y == 20){
 			foreach( $diagwin100['pillar'] as $num_5p=>$rat_5p){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5p]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5p].in_array($num_5p, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_5p."(".$rat_5p.")</td>";
 			    $x++;
 			}			
 		    } elseif ($y == 21){
 			foreach( $diagwin100['stepup'] as $num_5su=>$rat_5su){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5su]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5su].in_array($num_5su, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_5su."(".$rat_5su.")</td>";
 			    $x++;
 			}			
 		    } elseif ($y == 22){
 			foreach( $diagwin100['stepdown'] as $num_5sd=>$rat_5sd){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5sd]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_5sd].in_array($num_5sd, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_5sd."(".$rat_5sd.")</td>";
 			    $x++;
 			}			
 		    } elseif ($y == 24){
 			foreach( $ratios_sum['overall'] as $num_sumo=>$rat_sumo){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_sumo]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_sumo].in_array($num_sumo, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_sumo."(".$rat_sumo.")</td>";
 			    $x++;
 			}
 		    } elseif ($y == 25){
 			foreach( $ratios_sum['pillar'] as $num_sump=>$rat_sump){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_sump]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_sump].in_array($num_sump, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_sump."(".$rat_sump.")</td>";
 			    $x++;
 			}
 		    } elseif ($y == 26){
 			foreach( $ratios_sum['stepup'] as $num_sumsu=>$rat_sumsu){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_sumsu]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_sumsu].in_array($num_sumsu, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_sumsu."(".$rat_sumsu.")</td>";
 			    $x++;
 			}
 		    } elseif ($y == 27){
 			foreach( $ratios_sum['stepdown'] as $num_sumsd=>$rat_sumsd){
-			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_sumsd]];
+			    $body_data[$x][$y] = $predifined_tds['result_'.$lotto_results[$num_sumsd].in_array($num_sumsd, $unlucky_numbers)];
 			    $body_data[$x][$y] .= $num_sumsd."(".$rat_sumsd.")</td>";
 			    $x++;
 			}
@@ -843,6 +871,9 @@ function lotto_keno_betting_system_bettable_numbers_get($lottery_name, $apd_numb
 	    $diagwin100 = $apd_numbers['diagwin100'];
 	    
 	    switch($betting_profile){
+		case 0:
+		    $unlucky_numbers=array();
+		    break;
 		case 1:
 		    $unlucky_numbers = profile_exclude_currently_won_numbers($lottery_name, $draw_num);
 		    break;		    
@@ -959,11 +990,11 @@ function lotto_keno_betting_system_bets_performance_summary_quick($lottery_name,
 	
 	    foreach($validation_outcome as $diagwin_cat=>$data_diag){	
 		foreach($data_diag as $cat=>$bets){
-		    $bets_performance_summary[$diagwin_cat][$cat] = $summary_empty;
-		    $bets_performance_summary[$diagwin_cat][$cat]['picks'] = $set_of_each;
+		    $bets_performance_summary[$diagwin_cat][$cat] = $summary_empty;		   
 		    $bets_performance_summary[$diagwin_cat][$cat]['bets'] = count($bets);
 		    
 		    foreach($bets as $ind=>$matches){
+			$bets_performance_summary[$diagwin_cat][$cat]['picks'] = count($bettable_numbers_bets[$diagwin_cat][$cat][$ind]);
 			$match_count = count($matches);
 			if( !isset($bets_performance_summary[$diagwin_cat][$cat]['matches'][$match_count])){
 			    $bets_performance_summary[$diagwin_cat][$cat]['matches'][$match_count] = 0;
@@ -971,7 +1002,7 @@ function lotto_keno_betting_system_bets_performance_summary_quick($lottery_name,
 			} 
 			
 			$bets_performance_summary[$diagwin_cat][$cat]['matches'][$match_count] += 1;
-			$bets_performance_summary[$diagwin_cat][$cat]['win'][$match_count] += validate_ticket($lottery_name, $set_of_each, $match_count);
+			$bets_performance_summary[$diagwin_cat][$cat]['win'][$match_count] += validate_ticket($lottery_name, $bets_performance_summary[$diagwin_cat][$cat]['picks'], $match_count);
 		    }
 		}
 	    }
@@ -990,7 +1021,8 @@ function lotto_keno_betting_system_performance_grid_create($lottery_name, $apd_n
 	    $header = "<table class=\"betting_system_performance_grid\" ><tbody>";
 	    
 	    $label1 = "<tr>";
-	    $label1 .= "<th>Labels</th>";	    
+	    $label1 .= "<th>Labels</th>";
+	    $label1 .= "<th></th>";
 	    $label1 .= "<th colspan=\"6\" >Diagwin5</th>";
 	    $label1 .= "<th></th>";
 	    $label1 .= "<th colspan=\"6\" >Diagwin10</th>";
@@ -1001,10 +1033,11 @@ function lotto_keno_betting_system_performance_grid_create($lottery_name, $apd_n
 	    $label1 .= "<th></th>";
 	    $label1 .= "<th colspan=\"6\" >Diagwin100</th>";
 	    $label1 .= "<th></th>";
-	    $label1 .= "<th colspan=\"12\" >RatioSum</th>";
+	    $label1 .= "<th colspan=\"8\" >RatioSum</th>";
 	    $label1 .= "</tr>";
 	    
 	    $label2 = "<tr>";
+	    $label2 .= "<th></th>";
 	    $label2 .= "<th></th>";
 	    $label2 .= "<th colspan=\"2\" >Pillar</th>";
 	    $label2 .= "<th colspan=\"2\" >Stepup</th>";
@@ -1030,14 +1063,13 @@ function lotto_keno_betting_system_performance_grid_create($lottery_name, $apd_n
 	    $label2 .= "<th colspan=\"2\" >Pillar</th>";
 	    $label2 .= "<th colspan=\"2\" >Stepup</th>";
 	    $label2 .= "<th colspan=\"2\" >Stepdown</th>";
-	    $label2 .= "<th></th>";
 	    $label2 .= "</tr>";
 	    
 	    
 	    $body = "";
-	    $total_spent_html = "<tr><th colspan=\"6\" >Total Spent</th>";
-	    $total_won_html = "<tr><th colspan=\"6\" >Total Won</th>";	    
-	    $total_profit_html= "<tr><th colspan=\"6\" >Total Profit</th>";
+	    $total_spent_html = "<tr><th>Total Spent</th>";
+	    $total_won_html = "<tr><th>Total Won</th>";	    
+	    $total_profit_html= "<tr><th>Total Profit</th>";
 	    
 	    foreach($bets_performance as $diagwin_cat=>$data_diag){
 		$total_won=0; $total_spent=0; $total_profit=0;
