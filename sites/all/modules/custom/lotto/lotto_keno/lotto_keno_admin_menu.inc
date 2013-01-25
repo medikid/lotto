@@ -106,6 +106,22 @@ function lotto_keno_menu(){
         'access arguments' => array('Access Lotto Max Charts'),
         );
 	
+	$items['admin/lotto/lottokeno/bets/bettingsystem'] = array(
+        'title' => 'Betting System',
+        'description' => 'Betting System',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('get_lotto_keno_betting_system_performance_summary_form'),
+        'access arguments' => array('Access Lotto Max Charts'),
+        );
+	
+	$items['admin/lotto/lottokeno/bets/bettingsystem/performancesummary'] = array(
+        'title' => 'Performance Summary',
+        'description' => 'Betting System performance cumulative summary',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('get_lotto_keno_betting_system_performance_summary_form'),
+        'access arguments' => array('Access Lotto Max Charts'),
+        );
+	
 	
 	/********************************RESULTS*************************************************/
 	$items['admin/lotto/lottokeno/results'] = array(

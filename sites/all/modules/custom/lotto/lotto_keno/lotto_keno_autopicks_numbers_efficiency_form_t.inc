@@ -5,6 +5,7 @@ function get_lotto_keno_autopicks_numbers_efficiency_form_t($form, &$form_state)
     drupal_add_css(drupal_get_path('module', 'lotto_core') . '/css/number_grid.css', array('group' => CSS_DEFAULT, 'type' => 'file'));
     
     $form = array();
+    $lottery_name = "lotto_keno";
     if (isset($draw_num)){
 	$last_keno_draw_num = $draw_num;
     } else $last_keno_draw_num = get_last_keno_drawnumber("lotto_keno") - 1;
@@ -15,7 +16,7 @@ function get_lotto_keno_autopicks_numbers_efficiency_form_t($form, &$form_state)
 	'enable_performance_grid'=>1,
 	'enable_betting_system_grid'=>1,);
     
-    $numbers_spiral = get_lotto_autopicks_apd_numbers_quick("lotto_keno", $last_keno_draw_num, $last_keno_draw_num_val);
+    $numbers_spiral = get_lotto_autopicks_apd_numbers_quick($lottery_name, $last_keno_draw_num, $last_keno_draw_num_val);
        
     $form['efficiency']=array(
 	'#type'=>  'fieldset',
@@ -1071,11 +1072,39 @@ function lotto_keno_betting_system_performance_grid_create($lottery_name, $apd_n
 	    $total_won_html = "<tr><th>Total Won</th>";	    
 	    $total_profit_html= "<tr><th>Total Profit</th>";
 	    
+	    $matches_detail_html=array();
+	    for($x=10;$x>0;$x--){
+		if( ($x % 2) == 0){
+		    $matches_detail_html[$x] = "<tr style=\"background-color:lightgrey\"><th>".$x."s</th>";
+		} else $matches_detail_html[$x] = "<tr><th>".$x."s</th>";
+	    }
+	    $spent_html="<tr><th>Spent</th>";
+	    $won_html="<tr><th>Won</th>";
+	    
 	    foreach($bets_performance as $diagwin_cat=>$data_diag){
 		$total_won=0; $total_spent=0; $total_profit=0;
+		for($x=10;$x>0;$x--){
+		    $matches_detail_html[$x] .= "<th></th>";
+		}
+		    $spent_html .="<th></th>";
+		    $won_html .="<th></th>";
 		foreach($data_diag as $cat=>$summary){
-		    $total_spent += $summary['bets'];
-		    $total_won += array_sum( $summary['win'] );
+		    $spent = $summary['bets'];
+		    $won = array_sum( $summary['win'] );
+		    
+		    $spent_html .="<td></td><td>".$spent."</td>";
+		    $won_html .="<td></td><td>".$won."</td>";
+		    
+		    $total_spent += $spent;
+		    $total_won += $won;
+		    
+		    for($x=10;$x>0;$x--){
+			if (isset($summary['matches'][$x])){
+			     $matches_detail_html[$x] .= "<td>".$summary['matches'][$x]."</td><td>".$summary['win'][$x]."</td>";
+			} else {
+			    $matches_detail_html[$x] .= "<td></td><td></td>";
+			}
+		    }
 		}
 		$total_profit += $total_won - $total_spent;
 		$total_spent_html .= "<th></th><td colspan=\"6\" >".$total_spent."</td>";
@@ -1086,13 +1115,24 @@ function lotto_keno_betting_system_performance_grid_create($lottery_name, $apd_n
 	    //empty overall columns for the moment
 	    $total_spent_html .= "<th></th><td colspan=\"8\" >".$total_spent."</td>";
 	    $total_won_html .= "<th></th><td colspan=\"8\" >".$total_won."</td>";    
-	    $total_profit_html .= "<th></th><td colspan=\"8\" >".$total_profit."</td>";
+	    $total_profit_html .= "<th></th><td colspan=\"8\" >".$total_profit."</td>";    
+	    $spent_html .="<th></th><td colspan=\"8\" ></td>";
+	    $won_html .="<th></th><td colspan=\"8\"></td>";
+	    foreach($matches_detail_html as $matches=>$count_html){
+		$matches_detail_html[$matches] .= "<th></th><td colspan=\"8\" >";
+	    }
 	    
 	    $total_spent_html .= "</tr>";
 	    $total_won_html .= "</tr>";  
 	    $total_profit_html .= "</tr>";
+	    $spent_html .="</tr>";
+	    $won_html .="</tr>";
 	   
-	    $body .= $total_spent_html . $total_won_html .    $total_profit_html;
+	    $body .= $total_spent_html . $total_won_html .  $total_profit_html;
+	    foreach($matches_detail_html as $matches=>$count_html){
+		$body .= $count_html ."</tr>";
+	    }
+	    $body .= $spent_html . $won_html;	    
 	    
 	    $footer = "</tbody></table>";
 	    
