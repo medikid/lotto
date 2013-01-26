@@ -65,7 +65,7 @@ function get_lotto_keno_betting_system_performance_summary_form($form, $form_sta
 	'#type'=>'button',
 	'#value'=>t('Refresh'),
 	'#ajax'=>array(
-	    'callback' => 'ajx_autopicks_efficiency_refresh',
+	    'callback' => 'ajx_numbers_draw_number_refresh_batch',
 	    'wrapper'=>'ajx_autopicks_efficiency_wrapper',
 	    'method'=>'replace'
 	),
@@ -132,13 +132,59 @@ function get_lotto_keno_betting_system_performance_summary_form($form, $form_sta
     return $form;
 }
 
-function ajx_numbers_draw_number_prev_batch(){
+function ajx_numbers_draw_number_prev_batch($form, $form_state){
+    $lottery_name = "lotto_keno";
+    $draw_num = $form_state['values']['draw_number'];
+    $number_of_draws = $form_state['values']['number_of_draws'];
+    $draw_num_prev_batch = $draw_num - $number_of_draws;
     
+    $betting_profile=$form_state['values']['betting_profile'];
+    $number_of_picks=$form_state['values']['number_of_picks'];
+    $number_of_bets=$form_state['values']['number_of_bets'];
+    
+    $betting_system_performance_grid = lotto_keno_betting_system_performance_summary_grid_create($lottery_name, $draw_num_prev_batch, $number_of_draws, $betting_profile, $number_of_picks, $number_of_bets);
+    
+    $form['efficiency']['draw_number']['#value'] = $draw_num_prev_batch;
+    $form['efficiency']['betting_system_performance']['grid']['#markup'] = $betting_system_performance_grid;
+    
+    return $form['efficiency'];
 }
 
-function ajx_numbers_draw_number_next_batch(){
+function ajx_numbers_draw_number_next_batch($form, $form_state){
+    $lottery_name = "lotto_keno";
+    $draw_num = $form_state['values']['draw_number'];
+    $number_of_draws = $form_state['values']['number_of_draws'];
+    $draw_num_next_batch = $draw_num + $number_of_draws;
     
+    $betting_profile=$form_state['values']['betting_profile'];
+    $number_of_picks=$form_state['values']['number_of_picks'];
+    $number_of_bets=$form_state['values']['number_of_bets'];
+    
+    $betting_system_performance_grid = lotto_keno_betting_system_performance_summary_grid_create($lottery_name, $draw_num_next_batch, $number_of_draws, $betting_profile, $number_of_picks, $number_of_bets);
+    
+    $form['efficiency']['draw_number']['#value'] = $draw_num_next_batch;
+    $form['efficiency']['betting_system_performance']['grid']['#markup'] = $betting_system_performance_grid;
+    
+    return $form['efficiency'];    
 }
+
+function ajx_numbers_draw_number_refresh_batch($form, $form_state){
+    $lottery_name = "lotto_keno";
+    $draw_num = $form_state['values']['draw_number'];
+    $number_of_draws = $form_state['values']['number_of_draws'];
+    
+    $betting_profile=$form_state['values']['betting_profile'];
+    $number_of_picks=$form_state['values']['number_of_picks'];
+    $number_of_bets=$form_state['values']['number_of_bets'];
+    
+    $betting_system_performance_grid = lotto_keno_betting_system_performance_summary_grid_create($lottery_name, $draw_num, $number_of_draws, $betting_profile, $number_of_picks, $number_of_bets);
+        
+    $form['efficiency']['betting_system_performance']['grid']['#markup'] = $betting_system_performance_grid;
+    
+    return $form['efficiency'];    
+}
+
+
 function lotto_keno_betting_system_performance_summary_grid_create($lottery_name, $draw_num, $no_of_draws, $betting_profile, $no_of_picks, $number_of_bets=0){
     $betting_system_performance_summary_grid=array();
     switch($lottery_name){
@@ -192,7 +238,10 @@ function lotto_keno_betting_system_performance_summary_grid_create($lottery_name
 	    $label2 .= "</tr>";
 	    
 	    
-	    $body = "";
+	    $body = ""; 
+	    $overall_empty=array('diagwin5'=>0, 'diagwin10'=>0, 'diagwin20'=>0, 'diagwin50'=>0, 'diagwin100'=>0);
+	    $overall_spent=$overall_empty; $overall_won=$overall_empty;
+	    
 	    for($x=0; $x < $no_of_draws; $x++){
 		$draw_num_current = $draw_num - $x;
 		$betting_system_performance_summary =lotto_keno_betting_system_performance_summary($lottery_name, $draw_num_current, $betting_profile, $no_of_picks, $number_of_bets);
@@ -206,11 +255,17 @@ function lotto_keno_betting_system_performance_summary_grid_create($lottery_name
 		$body .= ($betting_system_performance_summary['diagwin5']['total_profit'] > 0) ? "<td class=\"green\" >" : "<td class=\"red\" >";
 		$body .= $betting_system_performance_summary['diagwin5']['total_profit']."</td>";
 		
+		$overall_spent['diagwin5'] += $betting_system_performance_summary['diagwin5']['total_spent'];
+		$overall_won['diagwin5'] += $betting_system_performance_summary['diagwin5']['total_won'];
+		
 		$body .=  "<th></th>";
 		$body .= "<td>".$betting_system_performance_summary['diagwin10']['total_spent']."</td>";
 		$body .= "<td>".$betting_system_performance_summary['diagwin10']['total_won']."</td>";
 		$body .= ($betting_system_performance_summary['diagwin10']['total_profit'] > 0) ? "<td class=\"green\" >" : "<td class=\"red\" >";
 		$body .= $betting_system_performance_summary['diagwin10']['total_profit']."</td>";
+		
+		$overall_spent['diagwin10'] += $betting_system_performance_summary['diagwin10']['total_spent'];
+		$overall_won['diagwin10'] += $betting_system_performance_summary['diagwin10']['total_won'];
 		
 		$body .=  "<th></th>";
 		$body .= "<td>".$betting_system_performance_summary['diagwin20']['total_spent']."</td>";
@@ -218,17 +273,26 @@ function lotto_keno_betting_system_performance_summary_grid_create($lottery_name
 		$body .= ($betting_system_performance_summary['diagwin20']['total_profit'] > 0) ? "<td class=\"green\" >" : "<td class=\"red\" >";
 		$body .= $betting_system_performance_summary['diagwin20']['total_profit']."</td>";
 		
+		$overall_spent['diagwin20'] += $betting_system_performance_summary['diagwin20']['total_spent'];
+		$overall_won['diagwin20'] += $betting_system_performance_summary['diagwin20']['total_won'];
+		
 		$body .=  "<th></th>";
 		$body .= "<td>".$betting_system_performance_summary['diagwin50']['total_spent']."</td>";
 		$body .= "<td>".$betting_system_performance_summary['diagwin50']['total_won']."</td>";
 		$body .= ($betting_system_performance_summary['diagwin50']['total_profit'] > 0) ? "<td class=\"green\" >" : "<td class=\"red\" >";
 		$body .= $betting_system_performance_summary['diagwin50']['total_profit']."</td>";
 		
+		$overall_spent['diagwin50'] += $betting_system_performance_summary['diagwin50']['total_spent'];
+		$overall_won['diagwin50'] += $betting_system_performance_summary['diagwin50']['total_won'];
+		
 		$body .=  "<th></th>";
 		$body .= "<td>".$betting_system_performance_summary['diagwin100']['total_spent']."</td>";
 		$body .= "<td>".$betting_system_performance_summary['diagwin100']['total_won']."</td>";
 		$body .= ($betting_system_performance_summary['diagwin100']['total_profit'] > 0) ? "<td class=\"green\" >" : "<td class=\"red\" >";
 		$body .= $betting_system_performance_summary['diagwin100']['total_profit']."</td>";
+		
+		$overall_spent['diagwin100'] += $betting_system_performance_summary['diagwin100']['total_spent'];
+		$overall_won['diagwin100'] += $betting_system_performance_summary['diagwin100']['total_won'];
 		
 		$body .=  "<th></th>";
 		$body .= "<td></td>";
@@ -238,6 +302,19 @@ function lotto_keno_betting_system_performance_summary_grid_create($lottery_name
 		$body .="</tr>";
 	    }
 	    
+	    $body .="<tr><th>Overall Total</th>";
+	    foreach($overall_spent as $overall_cat=>$spent){
+		$body .="<th></th>";
+		$body .= "<td class\"grey\" >". $spent ."</td>";
+		$body .= "<td class\"grey\" >".$overall_won[$overall_cat]."</td>";
+		$overall_profit = $overall_won[$overall_cat] - $spent;
+		$body .= ($overall_profit > 0) ? "<td class=\"green\" >" : "<td class=\"red\" >";
+		$body .= $overall_profit."</td>";
+	    }
+	    
+	    $body .= "<th></th>";
+	    $body .= "<td></td><td></td><td></td>";	    
+	    $body ."</tr>";
 	    
 	   $footer = "</tbody></table>";
 	   
